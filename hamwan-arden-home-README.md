@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20200415
+VERSION: 20200414
 
 AUTHOR:  Steve Magnuson AG7GN
 

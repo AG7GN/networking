@@ -1,6 +1,6 @@
 # Networking Notes and HOWTOs
 
-VERSION: 20200415
+VERSION: 20200416
 
 AUTHOR:  Steve Magnuson, AG7GN
 
@@ -8,5 +8,4 @@ AUTHOR:  Steve Magnuson, AG7GN
 
 [Managing your Comcast IPv6 Prefix Delegation on your Ubiquiti EdgeRouter](https://github.com/AG7GN/networking/blob/master/ubiquiti-ipv6-README.md)
 
-
- 
+[Netfilter Flowchart and Order of Operation](https://github.com/AG7GN/networking/blob/master/iptables-README.md)

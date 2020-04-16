@@ -1,6 +1,7 @@
 # Integrating AREDN and HamWAN with your Home Network
 
 VERSION: 20200415
+
 AUTHOR:  Steve Magnuson AG7GN
 
 This document describes one way to have your home network and Internet service peacefully coexist with AREDN and HamWAN networks.  If you have HamWAN or AREDN or both networks and want to connect them together in a safe way, this document is for you.
@@ -55,7 +56,7 @@ I'm making these assumptions about your current network:
 
 Here's what we're going to build:
 
-![Home + AREDN + HamWAN Network Integration](home-aredn-hamwan-integration.png)
+![Home + AREDN + HamWAN Network Integration](img/home-aredn-hamwan-integration.png)
 
 ### Address Assignments
 
@@ -190,7 +191,7 @@ ER-X `eth4`: `192.168.88.2/24`
 	
 1. We'll configure the ER-X to be a forwarding DNS server for your Home LAN.  We will set up the ER-X DNS to forward requests to Internet servers and then configure certain DNS settings.  Ubiquiti router use the open source `dnsmasq` forwarding DNS server.  See the [`dnsmasq` documentation](http://www.thekelleys.org.uk/dnsmasq/docs/dnsmasq-man.html) for a description of what these parameters do.  
 
-	Note the lines below that contain `...domain=home.lan...`.  That establishes a DNS 'zone' for your home network, so your devices at home will have names like `mypc.home.lan` and `iphone.home.lan` when they connect to your home network.  You can change `home.lan` to something else if desired.  The `name-server` IP addresses are servers at [Cloud Flare](https://www.cloudflare.com), a provider of reliable Internet DNS service.
+	Note the lines below that contain `...domain=home.lan...`.  That establishes a DNS 'zone' for your home network, so your devices at home will have names like `mypc.home.lan` and `iphone.home.lan` when they connect to your home network.  You can change `home.lan` to something else if desired.  The `name-server` IP addresses are servers at [Cloud Flare](https://www.cloudflare.com), a provider of reliable Internet DNS services.
 
 	Enter these commands in the CLI:
 
@@ -211,9 +212,7 @@ ER-X `eth4`: `192.168.88.2/24`
 		set service dns forwarding system
 		set system name-server 127.0.0.1
 		set system name-server '::1'
-		commit;save
-		exit
-		exit
+		commit;save;exit
 
 1.	Set your PC's ethernet port to automatically obtain an IP address.
 		
@@ -516,12 +515,12 @@ For Whatcom County, WA EMCOMM group members, the WECG operates an AREDN Tunnel S
 WECG will reply with this information:
 
 Your connection details:
-Name: *your-node-name*
-Password: *your-tunnel-password*
-Network: *ip-address-for-tunnel-network*
-Server address: *tunnel-DNS-name*
+- Name: *your-node-name*
+- Password: *your-tunnel-password*
+- Network: *ip-address-for-tunnel-network*
+- Server address: *tunnel-DNS-name*
 
-For Example:
+Example:
 
 Your connection details:
 - Name: AG7GN-AR150-1
@@ -549,6 +548,43 @@ How are you going to remember all of these IP addresses?  Use names instead be a
 
 1. Establish a CLI connection to your ER-X.
 
+Say you want to enter a hostname for a computer named 'humbolt'.  Earlier, in the `dnsmasq` configuration, we established a domain name of `home.lan`, so our name will be `humbolt.home.lan`.  Say it's IP address is `192.168.73.10`.
+
+1. Configure a static mapping for the host:
+
+		set system static-host-mapping host-name humbolt.toadbox.org inet 192.168.73.10
+
+1. Configure an alias, too:
+
+		set system static-host-mapping host-name humbolt.toadbox.org alias humbolt
+		
+	You can configure as many aliases as you want.
+
+1. Finish
+
+		commit;save;exit
+		
+### (Optional) DHCP Reservations
+
+To create a DHCP reservation:
+
+1. Open the web interface of your ER-X.
+
+1. Click the __Services__ tab.
+
+1. Select the __DHCP Server__ tab.
+
+1. Locate the desired LAN interface and click the corresponding __Actions__ button.
+
+1. Select __View leases__ from the dropdown.
+
+1. Locate the desired lease in the list.  Click __Map Static IP__.
+
+To delete a DHCP reservation:
+
+1. Select the __Static MAC/IP Mapping__ tab
+
+1. Locate the desired mapping and click the corresponding __Actions__ button, and select __Delete__ from the dropdown list.
 
 
 

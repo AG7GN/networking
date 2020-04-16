@@ -1,6 +1,7 @@
 # Networking Notes and HOWTOs
 
 VERSION: 20200415
+
 AUTHOR:  Steve Magnuson, AG7GN
 
 [Integrating AREDN and HamWAN with your Home Network](hamwan-aredn-home-README.md)

@@ -1,7 +1,7 @@
 # Integrating AREDN and HamWAN with your Home Network
 
 VERSION: 20200415
-AUTHOR: Steve Magnuson AG7GN
+AUTHOR:  Steve Magnuson AG7GN
 
 This document describes one way to have your home network and Internet service peacefully coexist with AREDN and HamWAN networks.  If you have HamWAN or AREDN or both networks and want to connect them together in a safe way, this document is for you.
 
@@ -107,38 +107,38 @@ ER-X `eth4`: `192.168.88.2/24`
 1. Log in to the ER-X web page at `192.168.1.1` as shown in the video.  Username and password are both `ubnt`.
 1. Run the wizard: Click __Yes__.
 
-	![Run the wizard](wizard1.PNG)
+	![Run the wizard](img/wizard1.PNG)
 
 1. Configure the Internet port as shown.  The configuration shown is for a cable modem.  Note that if you are using a DSL modem, you likely are using __PPPoE__, and so you'll check select that rather than __DHCP__. You'll need to provide the PPPoE credentials, too.
 
-	![Configure Internet port](wizard2.PNG)
+	![Configure Internet port](img/wizard2.PNG)
 	
 1. Scroll down to the __DNS Forwarding__ section and make these changes:
 
 	- For DNS servers, select __Use servers provided by the Internet Service Provider__
 	- Uncheck __Use ony one LAN__.
 	
-	![DNS and LAN Settings](wizard3.PNG)
+	![DNS and LAN Settings](img/wizard3.PNG)
 	
 1. Click on __Configure this section__ to expand the "(Optional) Secondary LAN ports (eth1)" and do the same for "LAN ports (eth2, eth3, eth4)".  Set the IP addresses as shown below.  
 
-	![Secondary LAN ports](wizard4.PNG)
+	![Secondary LAN ports](img/wizard4.PNG)
 
 1. Scroll down to the __User setup__ section.  *CHANGE THE PASSWORD* for the ubnt user!
 
-	![Password](wizard6.PNG)	
+	![Password](img/wizard6.PNG)	
 
 1. Click __Apply__.  Scroll down in the pop-up window and click __Apply Changes__.
 
-	![Apply Changes](wizard7.PNG)
+	![Apply Changes](img/wizard7.PNG)
 	
 1. Another pop-up appears.  Scroll down and click __Reboot__.
 
-	![Reboot](wizard8.PNG)
+	![Reboot](img/wizard8.PNG)
 	
 1. Click __Yes, I'm sure__.
 
-	![Reboot Confirm](wizard9.PNG)
+	![Reboot Confirm](img/wizard9.PNG)
 	
 1. Move your PC's ethernet cable from `eth0` to `eth1` and change your ethernet adapter's IP address setting to "Obtain an IP address automatically" as shown in the video. 
 
@@ -146,7 +146,7 @@ ER-X `eth4`: `192.168.88.2/24`
 
 1. Click the __CLI__ button (CLI is Command Line Interface) in the upper right, and log in again as `ubnt` and your new password.  The rest of the ER-X configuration will be done in the CLI.
 
-	![10](wizard10.PNG)
+	![10](img/wizard10.PNG)
 
 1. We're going to enable NAT and IPSec offloading to improve performance as described in the video.  Then we'll detach `eth2, eth3` and `eth4` from the ER-X internal switch and make them their own router ports, each with it's own IP address.  We'll also tell the ER-X to listen for DNS requests on your home LAN port `eth3`. Enter these commands in the CLI:
 
@@ -270,7 +270,7 @@ Now we'll test your home LAN connection through the ER-X.  Your PC should still 
 
 	For example, my AREDN node's LAN section looks like this:
 	
-	![AREDN LAN Configuration](AREDN_LAN.png)
+	![AREDN LAN Configuration](img/AREDN_LAN.png)
 	
 	So I write down the following:
 	
@@ -542,13 +542,6 @@ Your connection details:
 1. Once the tunnel is active, a blue cloud with an up arrow in it will appear in the __Active__ column.
 
 1. Click __Node Status__.  Click __Mesh Status__ to see what other nodes are part of the AREDN network.
-
-### (Optional) Enable IPv6 on the Home LAN
-
-If your ISP delegates IPv6 addresses to you, here's how to take advantage of it.  Comcast is an ISP that delegates IPv6 addresses to it's customers.  Don't do this step unless you know that your ISP delegates an IPv6 prefix to you.  
-
-1. Establish a CLI connection to your ER-X.
-
 
 ### (Optional) Define some Local Hostnames
 

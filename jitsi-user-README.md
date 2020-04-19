@@ -26,6 +26,42 @@ AUTHOR Steve Magnuson, AG7GN
 Instructions on starting a new meeting and joining a meeting follow.  Moving your mouse activates the menus and icons in the Jitsi browser interface.  
 ![Jitsi Screen](img/jitsi-screen.png)
 
+# Joining a Jitsi Meeting
+
+These instructions are for the Chrome browser.  Joining a meeting from the iOS or Android app is a slightly different process.
+
+1. Whoever set up the meeting should have sent you an email message with a URL of the form:
+
+		https://meet.jit.si/<string>
+		
+	where \<string\> is the meeting name set by the organizer.  There are no meeting numbers.  They may also have supplied you with a password if they chose to password protect the meeting.
+
+1. Install the [Chrome browser](https://www.google.com/chrome/index.html) on your PC if it's not already installed.  Jitsi will work in other browsers to varying degrees, but all of the features are implemented in Chrome.
+
+1. Start Chrome.
+
+1. Go to the URL provided by the meeting organizer, or go to [meet.jit.si](https://meet.jit.si) and enter the name of the meeting (the string after the last '/' in the URL), then press __Go__.
+
+1. The first time you join a Jitsi meeting, your Chrome browser may ask permission to use your camera and audio device.
+
+1. Click the 3 dots in a vertical line (called a "kabob") in the lower right.  You'll see something like this:
+
+	![kabob menu](img/jitsi2.png)
+
+	The very top item is your name as it appears to participants.  Click it, and you'll see something like this:
+	
+	![Settings Profile](img/jitsi3.png)
+	
+	Enter your first name and call sign so people know who you are.  Add your email address if desired (not necessary).
+	
+1. On that same Settings window, select Devices to manage your audio and video devices.
+
+	![Settings Devices](img/jitsi4.png)
+	
+1. Click __OK__ when done.
+
+1. Click the "handset in the red circle" icon to leave the meeting.  Note that even if the moderator leaves the meeting, the meeting will continue until the last participant leaves.
+
 # Starting a Jitsi Meeting
 
 These instructions are for the Chrome browser.  Starting a meeting from the iOS or Android app is a slightly different process.
@@ -78,42 +114,6 @@ These instructions are for the Chrome browser.  Starting a meeting from the iOS 
 		
 		*All participants screen layout and view is the same as the presenter.*
 		
-1. Click __OK__ when done.
-
-1. Click the "handset in the red circle" icon to leave the meeting.  Note that even if the moderator leaves the meeting, the meeting will continue until the last participant leaves.
-
-# Joining a Jitsi Meeting
-
-These instructions are for the Chrome browser.  Joining a meeting from the iOS or Android app is a slightly different process.
-
-1. Whoever set up the meeting should have sent you an email message with a URL of the form:
-
-		https://meet.jit.si/<string>
-		
-	where \<string\> is the meeting name set by the organizer.  There are no meeting numbers.  They may also have supplied you with a password if they chose to password protect the meeting.
-
-1. Install the [Chrome browser](https://www.google.com/chrome/index.html) on your PC if it's not already installed.  Jitsi will work in other browsers to varying degrees, but all of the features are implemented in Chrome.
-
-1. Start Chrome.
-
-1. Go to the URL provided by the meeting organizer, or go to [meet.jit.si](https://meet.jit.si) and enter the name of the meeting (the string after the last '/' in the URL), then press __Go__.
-
-1. The first time you join a Jitsi meeting, your Chrome browser may ask permission to use your camera and audio device.
-
-1. Click the 3 dots in a vertical line (called a "kabob") in the lower right.  You'll see something like this:
-
-	![kabob menu](img/jitsi2.png)
-
-	The very top item is your name as it appears to participants.  Click it, and you'll see something like this:
-	
-	![Settings Profile](img/jitsi3.png)
-	
-	Enter your first name and call sign so people know who you are.  Add your email address if desired (not necessary).
-	
-1. On that same Settings window, select Devices to manage your audio and video devices.
-
-	![Settings Devices](img/jitsi4.png)
-	
 1. Click __OK__ when done.
 
 1. Click the "handset in the red circle" icon to leave the meeting.  Note that even if the moderator leaves the meeting, the meeting will continue until the last participant leaves.

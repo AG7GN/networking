@@ -114,7 +114,7 @@ These instructions are for the Chrome browser.  Joining a meeting from the iOS o
 
 	![Settings Devices](img/jitsi4.png)
 	
-1. Click OK when done.
+1. Click __OK__ when done.
 
 1. Click the "handset in the red circle" icon to leave the meeting.  Note that even if the moderator leaves the meeting, the meeting will continue until the last participant leaves.
 

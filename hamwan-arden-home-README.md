@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20200419
+VERSION: 20200420
 
 AUTHOR:  Steve Magnuson AG7GN
 
@@ -19,7 +19,7 @@ This is a long procedure.  To increase your chances of success, read through the
 - The AREDN image is installed and operational on your AREDN router and you can access it's web interface.  [These instructions](https://arednmesh.readthedocs.io/en/latest/arednGettingStarted/installing_firmware.html) will guide you in getting the image installed.
 - [HamWAN](http://hamwan.org/) hardware connected to HamWAN per the [recommended configuration](http://hamwan.org/Standards/Network%20Engineering/Client%20Node%20Configuration.html).  
 - You are connected to HamWAN and can access your HamWAN router's command line interface (CLI) via SSH.
-- [Ubiquiti ER-X router](https://www.ui.com/edgemax/edgerouter-x/).  Other Ubiquiti EdgeRouters will also work, but require a more complicated configuration and may require a VLAN-aware switch.
+- [Ubiquiti ER-X router](https://www.ui.com/edgemax/edgerouter-x/).  Other Ubiquiti EdgeRouters will also work, but require a more complicated configuration and may require a VLAN-aware ("managed") switch.
 - Garden-variety home router + switch + access point device (likely your current router).
 - Internet service via a cable or DSL modem.
 Note that I'm talking about a MODEM here, not an integrated modem and router provided by your ISP.  We want the Ubiquiti ER-X to do the routing and other related functions.  It is possible to use an ISP-provided router, but it's more complicated than what I describe here.  Do yourself a favor (and save some money) and return the ISP's router and get a cable modem, if you can.  Customers who get phone service from the cable company may be stuck with the ISP's router (sorry!).
@@ -420,7 +420,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall group network-group RFC1918_Nets network 192.168.0.0/16
 
 
-1. Prevent AREDN IP addresses from reaching private IP addresses via the ARENDN WAN port.  Our Home LAN IP address block is in this group, so this isolates the Home LAN from traffic originating from AREDN.
+1. Prevent AREDN IP addresses from reaching private IP addresses via the AREDN WAN port.  Our Home LAN IP address block is in this group, so this isolates the Home LAN from traffic originating from AREDN.
 
 		set firewall name AREDN_WAN_IN default-action drop
 		set firewall name AREDN_WAN_IN description 'AREDN WAN In'

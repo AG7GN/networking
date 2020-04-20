@@ -336,10 +336,9 @@ So, in my case the IP address with CIDR notation netmask I'll assign to my ER-X 
 
 		set protocols static route 10.0.0.0/8 next-hop 10.27.190.1 description AREDN
 
-1. Finally, we'll tell the ER-X DNS server to send requests for name resolution for names ending in `.local.mesh` to the AREDN router's LAN interface.  In my case, that is `10.27.190.1`. Again, __*your address will be different*__.  The second line below suppresses [IPv6](https://en.wikipedia.org/wiki/IPv6) name lookups in `.local.mesh`.  AREDN does not use IPv6.
+1. Finally, we'll tell the ER-X DNS server to send requests for name resolution for names ending in `.local.mesh` to the AREDN router's LAN interface IP address where the local AREDN DNS server is listening.  In my case, that is `10.27.190.1`. Again, __*your address will be different*__.  
 
 		set service dns forwarding options server=/local.mesh/10.27.190.1
-		set service dns forwarding options 'address=/local.mesh/'
 		commit;save
 
 1. Connect an ethernet cable from ER-X port `eth2` to the AREDN router LAN port.

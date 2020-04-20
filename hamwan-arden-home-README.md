@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20200414
+VERSION: 20200419
 
 AUTHOR:  Steve Magnuson AG7GN
 
@@ -339,7 +339,7 @@ So, in my case the IP address with CIDR notation netmask I'll assign to my ER-X 
 1. Finally, we'll tell the ER-X DNS server to send requests for name resolution for names ending in `.local.mesh` to the AREDN router's LAN interface.  In my case, that is `10.27.190.1`. Again, __*your address will be different*__.  The second line below suppresses [IPv6](https://en.wikipedia.org/wiki/IPv6) name lookups in `.local.mesh`.  AREDN does not use IPv6.
 
 		set service dns forwarding options server=/local.mesh/10.27.190.1
-		set service dns forwarding options 'address=/local.mesh/::'
+		set service dns forwarding options 'address=/local.mesh/'
 		commit;save
 
 1. Connect an ethernet cable from ER-X port `eth2` to the AREDN router LAN port.

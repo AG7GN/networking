@@ -7,7 +7,7 @@ AUTHOR Steve Magnuson, AG7GN
 [Jitsi](https://jitsi.org) is a videoconferencing technology similar to Zoom.  Some of the features of Jitsi:
 
 - It uses open source server software.
-- You don't need an account to participate or moderate a Jitsi meeting
+- You don't need an account to participate or moderate a Jitsi meeting.
 - There is no Jitsi client software for the PC.  It runs best in the [Chrome browser](https://www.google.com/chrome/index.html).  It will work on Mac, Windows, and Linux - any platform that can run the Chrome browser.
 - There are apps available for Apple iOS and Android devices.  Search for the __Jitsi Meet__ app.
 - Jitsi allows you to share your screen or an individual application.  Any participant can share their screen or an application at any time.

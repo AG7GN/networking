@@ -60,6 +60,8 @@ These instructions are for the Chrome browser.  Joining a meeting from the iOS o
 	
 1. Click __OK__ when done.
 
+1. You can mute/unmute by clicking the microphone icon.  Also, if you press the space bar, it'll mute you.  Thereafter, it'll stay muted until you press the spacebar again - as long as you're holding down the spacebar, you'll be unmuted.  To get out of that mode, click the microphone icon.
+
 1. Click the "handset in the red circle" icon to leave the meeting.  Note that even if the moderator leaves the meeting, the meeting will continue until the last participant leaves.
 
 # Starting a Jitsi Meeting
@@ -115,6 +117,8 @@ These instructions are for the Chrome browser.  Starting a meeting from the iOS 
 		*All participants screen layout and view is the same as the presenter.*
 		
 1. Click __OK__ when done.
+
+1. You can mute/unmute by clicking the microphone icon.  Also, if you press the space bar, it'll mute you.  Thereafter, it'll stay muted until you press the spacebar again - as long as you're holding down the spacebar, you'll be unmuted.  To get out of that mode, click the microphone icon.
 
 1. Click the "handset in the red circle" icon to leave the meeting.  Note that even if the moderator leaves the meeting, the meeting will continue until the last participant leaves.
 

@@ -1,6 +1,6 @@
 # Notes on Configuring a Private Jitsi Server
 
-VERSION 20200419
+VERSION 20200523
 
 AUTHOR Steve Magnuson, AG7GN
 
@@ -153,4 +153,5 @@ Use these instructions to uninstall and start over, not the ones in the [Jitsi M
 
 		sudo apt-get --purge remove jigasi jitsi-meet jitsi-meet-web-config jitsi-meet-prosody jitsi-meet-turnserver jitsi-meet-web jicofo jitsi-videobridge2	prosody
 		sudo rm -rf /var/lib/prosody
+		sudo rm -rf /etc/prosody
 	

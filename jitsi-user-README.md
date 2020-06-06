@@ -34,13 +34,19 @@ These instructions are for the Chrome browser.  Joining a meeting from the iOS o
 
 		https://meet.jit.si/<string>
 		
+	Or, for those situations where the meeting was set up on the Whatcom County AREDN Jitsi server:
+	
+		https://w7ecg-meet.local.mesh/<string>
+		
+	For meetings hosted on `w7ecg-meet.local.mesh`, your client must be connected to the Whatcom County AREDN network.
+		
 	where \<string\> is the meeting name set by the organizer.  There are no meeting numbers.  They may also have supplied you with a password if they chose to password protect the meeting.
 
 1. Install the [Chrome browser](https://www.google.com/chrome/index.html) on your PC if it's not already installed.  Jitsi will work in other browsers to varying degrees, but all of the features are implemented in Chrome.
 
 1. Start Chrome.
 
-1. Go to the URL provided by the meeting organizer, or go to [meet.jit.si](https://meet.jit.si) and enter the name of the meeting (the string after the last '/' in the URL), then press __Go__.
+1. Go to the URL provided by the meeting organizer, or go to [meet.jit.si](https://meet.jit.si) (or [w7ecg-meet.local.mesh](https://w7ecg-meet.local.mesh) if applicable and as explained earlier) and enter the name of the meeting (the string after the last '/' in the URL), then press __Go__.
 
 1. The first time you join a Jitsi meeting, your Chrome browser may ask permission to use your camera and audio device.
 
@@ -72,7 +78,7 @@ These instructions are for the Chrome browser.  Starting a meeting from the iOS 
 
 1. Start Chrome.
 
-1. Go to [meet.jit.si](https://meet.jit.si) and enter any *unique* string (no spaces or punctuation) in the __Start a new meeting__ field.  If someone else happens to be using the same string as you, when you click __Go__, you'll join their meeting!  So, make your string *unique*.
+1. Go to [meet.jit.si](https://meet.jit.si) (or [w7ecg-meet.local.mesh](https://w7ecg-meet.local.mesh) if applicable) and enter any *unique* string (no spaces or punctuation) in the __Start a new meeting__ field.  If someone else happens to be using the same string as you, when you click __Go__, you'll join their meeting!  So, make your string *unique*.
 
 1. Click __Go__.
 

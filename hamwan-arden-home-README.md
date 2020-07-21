@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20200523
+VERSION: 20200721
 
 AUTHOR:  Steve Magnuson AG7GN
 
@@ -42,7 +42,7 @@ This document describes one method to integrate these 3 networks at your QTH in 
 
 I won't explain every networking principle underlying the design described in this document because the document would be a hundred pages long and I don't have that kind of time!  Where appropriate, I've provided links to external resources where you can learn more about the underlying technology.
 
-For AREDN and Ubiquiti equipment, I'll provide the necessary commands or instructions to make this work, so you will need command line interface (CLI) access to your HamWAN and Ubiquiti equipment.  The Ubiquiti ER-X router provides a CLI in it's web interface or via [Secure Shell](https://www.ssh.com/ssh/) (SSH).  For the HamWAN router, use SSH to get to the CLI.
+For HamWAN and Ubiquiti equipment, I'll provide the necessary commands or instructions to make this work, so you will need command line interface (CLI) access to your HamWAN and Ubiquiti equipment.  The Ubiquiti ER-X router provides a CLI in it's web interface or via [Secure Shell](https://www.ssh.com/ssh/) (SSH).  For the HamWAN router, use SSH to get to the CLI.
 
 I'm making these assumptions about your current network:
 
@@ -100,6 +100,8 @@ ER-X `eth4`: `192.168.88.2/24`
 
 ### Configure ER-X Router - Part 1
 
+1. It's likely that when your ER-X router arrives, it'll have an older version of firmware. Using a PC with Internet access, visit the EdgeRouter [downloads](https://www.ui.com/download/edgemax) page. You'll see a lot of files on that page.  We're interested in the most recent version for the `EdgeRouter ER-X/ER-X-SFP/EP-R6/ER-10X` models.  As of this writing, the latest version is `v2.0.8-hotfix.1`. You may see more than one firmware file for the ER-X listed.  Look for the most recent version. Click the corresponding download link and save it to your PC. Use this same PC to configure the ER-X in the following steps, or transfer the downloaded firmware file to the PC you'll be using in the following steps.
+
 1. You'll need to initially configure the ER-X in isolation from your home network - just the ER-X, a PC and an ethernet cable.  
 	- [Watch this video](https://www.youtube.com/watch?v=aECPxlT6Qq4) for a good overview of how to connect your PC to the ER-X and how to use the "wizard" in the ER-X web interface to do the initial configuration.
 
@@ -107,7 +109,17 @@ ER-X `eth4`: `192.168.88.2/24`
 		
 1. Connect your PC to the ER-X `eth0` port and assign your PC's ethernet port the static IP address (`192.168.1.2`) as shown in the video.
 1. Log in to the ER-X web page at `192.168.1.1` as shown in the video. The default username and password are both `ubnt`.
-1. Run the wizard: Click __Yes__.
+1. Let's see if we need to update the firmware on your ER-X.  In the upper left of the web page and to the right of the EdgeMax icon, it'll tell you the version. If the version shown is older than the version you downloaded in the first step, upgrade the firmware on your ER-X as follows:
+
+	- If prompted to run the Basic Setup wizard, click __No__.
+	- Click the __System__ button at the bottom of the page.
+	- Scroll down to the __Configuration Management & Device Maintenance__ section.
+	- Click the __Upload system image: Upload a File__ button.
+	- Select the new firmware file you downloaded earlier.
+	- Follow the instructions provided on the screen to complete the firmware update.
+	- After the router reboots, log back in to the ER-X web page.
+	
+1. If you are prompted to run the wizard, click __Yes__. If you're not prompted to run the Wizard, click the __Wizards__ button in the upper right, then click __Basic Setup__.
 
 	![Run the wizard](img/wizard1.PNG)
 
@@ -224,7 +236,7 @@ Every WRS manufacturer has a different procedure for what we're about to do, so 
 1. Open a browser and log in to your WRS web interface.
 1. Save a backup copy of your router's configuration if it has such a feature, and know how to do a factory reset on your WRS in case something goes awry.
 1. Disconnect your WRS "WAN" or "Internet" port from your cable/DSL modem.  
-1. Disable the router function on your WRS.  Manufacturers typically call this changing to "bridge mode" as opposed to the mode it's likely in now, "router mode".  
+1. Disable the router function on your WRS.  Manufacturers typically call this changing to "bridge" or "access point" mode as opposed to the mode it's likely in now, "router" mode.  
 1. Disable the DHCP server function.  This is *CRITICAL*, because we want the ER-X to be the DHCP server, not your WRS, and there can only be one DHCP server on a network at a time.  
 1. Set your WRS's LAN IP address to STATIC with these values:
 
@@ -670,11 +682,11 @@ How are you going to remember all of these IP addresses? Use names instead by ad
 
 1. Configure a static mapping for the host:
 
-		set system static-host-mapping host-name humbolt.toadbox.org inet 192.168.73.10
+		set system static-host-mapping host-name humbolt.home.lan inet 192.168.73.10
 
 1. Configure an alias, too:
 
-		set system static-host-mapping host-name humbolt.toadbox.org alias humbolt
+		set system static-host-mapping host-name humbolt.home.lan alias humbolt
 		
 	You can configure as many aliases as you want.
 
@@ -686,23 +698,23 @@ How are you going to remember all of these IP addresses? Use names instead by ad
 
 - To create a DHCP reservation:
 
-1. Open the web interface of your ER-X.
+	1. Open the web interface of your ER-X.
 
-1. Click the __Services__ tab.
+	1. Click the __Services__ tab.
 
-1. Select the __DHCP Server__ tab.
+	1. Select the __DHCP Server__ tab.
 
-1. Locate the desired LAN interface and click the corresponding __Actions__ button.
+	1. Locate the desired LAN interface and click the corresponding __Actions__ button.
 
-1. Select __View leases__ from the dropdown.
+	1. Select __View leases__ from the dropdown.
 
-1. Locate the desired lease in the list. Click __Map Static IP__.
+	1. Locate the desired lease in the list. Click __Map Static IP__.
 
 - To delete a DHCP reservation:
 
-1. Select the __Static MAC/IP Mapping__ tab
+	1. Select the __Static MAC/IP Mapping__ tab
 
-1. Locate the desired mapping and click the corresponding __Actions__ button, and select __Delete__ from the dropdown list.
+	1. Locate the desired mapping and click the corresponding __Actions__ button, and select __Delete__ from the dropdown list.
 
 
 

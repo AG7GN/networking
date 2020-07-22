@@ -303,10 +303,10 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 	
 1. My table now looks like this.  Again, ***your table will have different values***:
 
-| Line | Value |
-| :--: | :--: |
-| 1 | __10.27.190.1__ |
-| 2 | __10.27.190.14/28__ |
+	| Line | Value |
+	| :--: | :--: |
+	| 1 | __10.27.190.1__ |
+	| 2 | __10.27.190.14/28__ |
 
 	Set the table aside.  We'll be using it later.
 	

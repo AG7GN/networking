@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20200721
+VERSION: 20200722
 
 AUTHOR:  Steve Magnuson AG7GN
 
@@ -108,6 +108,8 @@ ER-X `eth4`: `192.168.88.2/24`
 		__NOTE: *We'll be configuring the wizard differently than what is shown in the video!*__ Watch the video just to get a general idea of the steps. Don't execute the steps with the settings shown on the video on your own router.
 		
 1. Connect your PC to the ER-X `eth0` port and assign your PC's ethernet port the static IP address (`192.168.1.2`) as shown in the video.
+
+__NOTE__: The ER-X web interface uses pop up windows and your browser may be blocking those.  If you find that certain screens are not what they shodEnable pop-ups in your browser while configuring the ER-X
 1. Log in to the ER-X web page at `192.168.1.1` as shown in the video. The default username and password are both `ubnt`.
 1. Let's see if we need to update the firmware on your ER-X.  In the upper left of the web page and to the right of the EdgeMax icon, it'll tell you the version. If the version shown is older than the version you downloaded in the first step, upgrade the firmware on your ER-X as follows:
 
@@ -264,7 +266,7 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 ### Configure the AREDN Router
 
 1. Attach your PC to the LAN port of your AREDN router and log in to the AREDN router's web interface at __http://localnode.local.mesh:8080/__. You should have no other ethernet connections to your AREDN router at this point.
-1. Click __Setup__.  Look at the __LAN__ section. The __LAN Mode__ dropdown has these choices:
+1. Click __Setup__ (log in if prompted). Look at the __LAN__ section. The __LAN Mode__ dropdown has these choices:
 	- NAT
 	- 1 host direct
 	- 5 host direct
@@ -273,17 +275,38 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 	
 	This defines the number of devices you anticipate connecting to the LAN interface of your ARDEN router. It has nothing to do with your home network or the number of devices on that network. For most users, 5 or 13 is adequate. Change it if desired, then __Save Changes__ and __Reboot__.
 	
-1. Once you're (back) into the AREDN router __Setup__ page, look at the LAN section again and note the __IP address__, the __Netmask__ and the __DHCP End__ number.  Write these values down because we're going to need them later.
+1. Once you're (back) into the AREDN router __Setup__ page, look at the LAN section again and note the __IP address__, the __Netmask__ and the __DHCP End__ number.  
 
-	For example, my AREDN node's LAN section looks like this (*Yours will be different!*):
-		
+	For example, my LAN section looks like this (*Yours will be different!*):
+
 	![AREDN LAN Configuration](img/AREDN_LAN.png)
+
+1. Get a pencil and paper and draw a table that looks like this:
+
+| Line | Value |
+| :--: | :--: |
+| 1 | ________________ |
+| 2 | ________________ |
+
+1. Write the __IP Address__ from *your* AREDN Setup page LAN section in the Value column for line 1. So using my LAN section as an example, the __IP Address__ is `10.27.190.1`. 
+
+	Notice that IP addresses are of the form `x.x.x.x`.  Each of the `x`s is called an __octet__ because in binary they are 8 bit numbers and so can have a range in decimal from 0 to 255. 
+1. In the Value column of line 2, write the __*first 3 octets*__ of the __IP Address__.  Using my LAN section as an example, I'd write: `10.27.190.`  
+1. For the ***last*** octet of the address you entered in line 2, enter the __DHCP End__ number from ***your*** AREDN Setup page LAN section.  Using my LAN section as an example, I'd write __14__ and my line 2 value should now be: `10.27.190.14`.
+1. Finally, look at the __Netmask__ value from ***your*** AREDN Setup page LAN section. Netmasks can be depicted in different ways. The ER-X router uses [CIDR notation](https://docs.netgate.com/pfsense/en/latest/book/network/understanding-cidr-subnet-mask-notation.html) for Netmask.  That's why we need to convert the "dotted decimal" notation that the AREDN router uses to CIDR notation. 
+
+	- If the Netmask is `255.255.255.248`, then add **`/29`** to the end of the IP address you wrote in the Value column of line 2.
+	- If the Netmask is `255.255.255.240`, then add **`/28`** to the end of the IP address you wrote in the Value column of line 2.
+	- If the Netmask is `255.255.255.224`, then add **`/27`** to the end of the IP address you wrote in the Value column of line 2.
 	
-	So I write down the following:
+	Using my LAN section as an example, my Netmask is **255.255.255.240**, so the IP address in the Value column of line 2 should now be `10.27.190.14/28`.
 	
-	- IP Address: `10.27.190.1`
-	- Netmask: `255.255.255.240`
-	- DHCP End: `14`
+1. My table now looks like this.  Again, ***your table will have different values***:
+
+| Line | Value |
+| :--: | :--: |
+| 1 | __10.27.190.1__ |
+| 2 | __10.27.190.14/28__ |
 	
 1. If you are not within WiFi range of another AREDN user's node or don't want to connect to the AREDN wireless mesh, __uncheck__ the __Enable__ box in the __Mesh RF__ section.  
 1. In the __WAN__ section, select __Protocol: Static__ and configure as follows:
@@ -321,25 +344,14 @@ Only 2 additional commands are needed in the HamWAN router. These commands tell 
 		add distance=1 dst-address=192.168.77.0/24 gateway=192.168.88.2
 		.. .. quit
 
-1. Connect an ethernet cable between the ER-X `eth4` port and the LAN port of your HamWAN router.
+1. Unplug your PC from your HamWAN router's ethernet port and leave your PC disconnected for now.
+1. Connect an ethernet cable between the ER-X `eth4` port and the ethernet port of your HamWAN router.
 
 ### Configure ER-X Router - Part 2
 
 We'll add to the DNS server configuration to enable name resolution of AREDN devices and we'll enable masquerade NAT on the AREDN LAN interface. Enabling masquerade NAT will give the AREDN router the illusion that the packets are coming from a device on it's own LAN when in reality they are coming from a device on your home network. The NAT feature plus AREDN name resolution will allow any of your home LAN devices to access any AREDN devices by name or IP address.
 
-Remember those numbers you wrote down in the [Configure AREDN Router - Part 1](#configure-aredn-router---part-1)?  You're going to use those now. I'll use my numbers as an example in this part of the procedure.  Your numbers will be different - __*DO NOT*__ use my numbers in your configuration! It will not work.
-
-- IP Address: `10.27.190.1`
-- Netmask: `255.255.255.240`
-- DHCP End: `14`
-
-The address I'll assign to my ER-X `eth2` port is the IP address as above, but instead of ending in `.1`, it'll end in the value of __DHCP End__, so my ER-X `eth2` IP address will be `10.27.190.14`. The ER-X router uses [CIDR notation](https://docs.netgate.com/pfsense/en/latest/book/network/understanding-cidr-subnet-mask-notation.html) for Netmask.  Use the translation table below to determine the CIDR notation equivalent of your netmask:
-
-- 255.255.255.248 = /29
-- 255.255.255.240 = /28
-- 255.255.255.224 = /27
-
-So, in my case the IP address with CIDR notation netmask I'll assign to my ER-X `eth2` port is `10.27.190.14/28`.
+Remember that table you made in the [Configure AREDN Router - Part 1](#configure-aredn-router---part-1) step?  You're going to use it now. 
 
 #### NAT and DNS
 
@@ -349,23 +361,23 @@ So, in my case the IP address with CIDR notation netmask I'll assign to my ER-X 
 
 		configure
 		delete interfaces ethernet eth2 address 10.1.1.1/24
-		set interfaces ethernet eth2 address 10.27.190.14/28
+		set interfaces ethernet eth2 address <value from Line 2 in your table>
 		set service nat rule 5020 description 'masquerade for AREDN LAN'
 		set service nat rule 5020 outbound-interface eth2
 		set service nat rule 5020 type masquerade
 
-1.	Next, we'll add a static route in the ER-X so it knows how to reach the 10.x.x.x address subnet used by AREDN.  Note that we're going to tell the ER-X that it's next hop (next router) to get to the 10.x.x.x address block is the IP address of the AREDN LAN interface. In my case, that's `172.27.190.1`.  Again, __*your next-hop address will be different*__.
+1.	Next, we'll add a static route in the ER-X so it knows how to reach the 10.x.x.x address block used by AREDN.  Note that we're going to tell the ER-X that it's next hop (next router) to get to the 10.x.x.x address block is the IP address of the AREDN LAN interface from your table. 
 
-		set protocols static route 10.0.0.0/8 next-hop 10.27.190.1 description AREDN
+		set protocols static route 10.0.0.0/8 next-hop <value from Line 1 in your table> description AREDN
 
-1. Finally, we'll tell the ER-X DNS server to send requests for name resolution for names ending in `.local.mesh` to the AREDN router's LAN interface IP address where your local AREDN node's DNS server is listening. In my case, that is `10.27.190.1`. Again, __*your address will be different*__.  
+1. Finally, we'll tell the ER-X DNS server to send requests for name resolution for names ending in `.local.mesh` to the AREDN router's LAN interface IP address (from your table) where your local AREDN node's DNS server is listening. 
 
-		set service dns forwarding options server=/local.mesh/10.27.190.1
+		set service dns forwarding options server=/local.mesh/<value from Line 2 in your table>
 		commit;save
 
 1. Connect an ethernet cable from ER-X port `eth2` to the AREDN router LAN port.
 
-1. Open another browser window on your PC and see if you can go to __http://localnode.local.mesh__. If so, it's working!  
+1. Open another browser window on your PC and see if you can go to __http://localnode.local.mesh__, which is the web interface of your AREDN router.  If so, it's working!  
 
 #### Policy Routing
 
@@ -443,7 +455,7 @@ So, in my case the IP address with CIDR notation netmask I'll assign to my ER-X 
 
 After running the wizard earlier, the firewall is configured such that all traffic inbound on the Internet facing interface `eth0` is dropped unless it is in reply to traffic sent by a device on our AREDN or Home LANs. Traffic arriving on `eth0` that is in reply to traffic we originated from our inside devices is called "established and related".  The firewall keeps track of all of the conversations our devices are having and it knows which IP address initiated each conversation.  If our inside device initiates a conversation, the firewall assumes that any replies coming in from the Internet related to that conversation are OK and are allowed to pass. When you are on a PC on your home LAN and open a web browser and connect to your bank's website, for example, your PC *initiated* that conversation with your bank's website.  From then on, any packets from your bank's website to your PC that are part of that conversation ('established and related') are allowed from the Internet.  Note that the firewall rules below have numbers.  Those numbers are used to tell the firewall the order in which to evaluate the rules.  Firewall rule order is important.
 
-1.	Make a group of the private IP address defined in [RFC1918](https://tools.ietf.org/html/rfc1918).  All of our inside networks are in these address ranges.
+1.	Make a group of the private IP address defined in [RFC1918](https://tools.ietf.org/html/rfc1918).  All of our inside networks, as well as AREDN networks, are in these address ranges.
 
 		set firewall group network-group RFC1918_Nets description 'Private IP address blocks'
 		set firewall group network-group RFC1918_Nets network 10.0.0.0/8

@@ -285,8 +285,8 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 
 | Line | Value |
 | :--: | :--: |
-| 1 |            |
-| 2 |            |
+| 1 | ______________ |
+| 2 | ______________ |
 
 1. Write the __IP Address__ from *your* AREDN Setup page LAN section in the Value column for line 1. So using my LAN section as an example, the __IP Address__ is `10.27.190.1`. 
 
@@ -307,6 +307,8 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 | :--: | :--: |
 | 1 | __10.27.190.1__ |
 | 2 | __10.27.190.14/28__ |
+
+	Set the table aside.  We'll be using it later.
 	
 1. If you are not within WiFi range of another AREDN user's node or don't want to connect to the AREDN wireless mesh, __uncheck__ the __Enable__ box in the __Mesh RF__ section.  
 1. In the __WAN__ section, select __Protocol: Static__ and configure as follows:

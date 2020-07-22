@@ -285,8 +285,8 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 
 | Line | Value |
 | :--: | :--: |
-| 1 | ________________ |
-| 2 | ________________ |
+| 1 |            |
+| 2 |            |
 
 1. Write the __IP Address__ from *your* AREDN Setup page LAN section in the Value column for line 1. So using my LAN section as an example, the __IP Address__ is `10.27.190.1`. 
 
@@ -403,7 +403,7 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 		set firewall group network-group HAMWAN_NETS network 44.34.128.0/21
 		set firewall group network-group HAMWAN_NETS network 44.36.240.0/21
 
-1. Make a group for the ports used for AREDN Tunnels (just one port for now):
+1. Make a group for the port used for AREDN Tunnels:
 
 		set firewall group port-group AREDN_TUNNEL description 'AREDN Tunnel Port'
 		set firewall group port-group AREDN_TUNNEL port 5525
@@ -424,7 +424,7 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 
 		set firewall modify POLICY_ROUTE rule 20 action modify
 		set firewall modify POLICY_ROUTE rule 20 description 'HamWAN destinations'
-		set firewall modify POLICY_ROUTE rule 20 destination group address-group HAMWAN_NETS
+		set firewall modify POLICY_ROUTE rule 20 destination group network-group HAMWAN_NETS
 		set firewall modify POLICY_ROUTE rule 20 modify table 88
 
 1. Let's make sure that any tunnels from a __Tunnel Client__ on your local AREDN node to a __Tunnel Server__ elsewhere are built through the HamWAN path rather than via our regular ISP. AREDN tunnel client traffic will come from 192.168.77.2, the IP address of our AREDN node's WAN interface, and be sent to a destination port of `5525`, which we set earlier in `port-group AREDN_TUNNEL`.

@@ -6,7 +6,7 @@ AUTHOR:  Steve Magnuson AG7GN
 
 This document describes one way to have your home network and Internet service peacefully coexist with AREDN and HamWAN networks.  If you have HamWAN or AREDN or both networks and want to connect them together in a reasonably safe way, this document is for you.
 
-We will be introducing a new "brain" into your home network - a routing device that will manage security, IP addresses and routing between the Internet, your home network, HamWAN and AREDN.  This device is the Ubiquiti [Ubiquiti ER-X router](https://www.ui.com/edgemax/edgerouter-x/).
+We will be introducing a new "brain" into your home network - a routing device that will manage security, IP addresses and routing between the Internet, your home network, HamWAN and AREDN.  This device is the [Ubiquiti ER-X router](https://www.ui.com/edgemax/edgerouter-x/).
 
 ## Disclaimer
 
@@ -42,14 +42,14 @@ This document describes one method to integrate these 3 networks at your QTH in 
 
 I won't explain every networking principle underlying the design described in this document because the document would be a hundred pages long and I don't have that kind of time!  Where appropriate, I've provided links to external resources where you can learn more about the underlying technology.
 
-For HamWAN and Ubiquiti equipment, I'll provide the necessary commands or instructions to make this work, so you will need command line interface (CLI) access to your HamWAN and Ubiquiti equipment.  The Ubiquiti ER-X router provides a CLI in it's web interface or via [Secure Shell](https://www.ssh.com/ssh/) (SSH).  For the HamWAN router, use SSH to get to the CLI.
+For HamWAN and Ubiquiti equipment, I'll provide the necessary commands or instructions to make this work, so you will need command line interface (CLI) access to your HamWAN and Ubiquiti equipment.  The Ubiquiti ER-X router provides a CLI in it's web interface or via [Secure Shell](https://www.ssh.com/ssh/) (SSH).  For the HamWAN router, use SSH to get to the CLI. There are minimal changes needed to the HamWAN router and you can use the `Winbox` application (if you're using a Windows PC) instead of SSH to make those changes. This procedure only documents using SSH to edit the HamWAN router.
 
 I'm making these assumptions about your current network:
 
 - You have a typical Internet connection consisting of a cable or DSL modem and a *separate* WiFi/router/switch. Your WiFi/router/switch's WAN port is plugged into the cable or DSL modem's "LAN" or "NETWORK" port and it is working correctly.
 - You have one or both of these:
-	- A working HamWAN router that is connected to the HamWAN Network but not connected to your home network.
-	- A working AREDN router that not connected to your home network. See the [AREDN Getting Started Guide](https://arednmesh.readthedocs.io/en/latest/arednGettingStarted/aredn_overview.html) to install the AREDN image on your hardware.
+	- A working HamWAN router that is connected to the HamWAN network but not connected to your home network.
+	- A working AREDN router that is not connected to your home network. See the [AREDN Getting Started Guide](https://arednmesh.readthedocs.io/en/latest/arednGettingStarted/aredn_overview.html) to install the AREDN image on your hardware.
 - You have a new Ubiquiti ER-X that is still at factory default settings. You can [reset to factory defaults](https://help.ubnt.com/hc/en-us/articles/205202620-EdgeRouter-Reset-to-Factory-Defaults) if necessary.
 
 ## Diagram
@@ -281,7 +281,7 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 	
 	So I write down the following:
 	
-	- IP Address: `172.27.190.1`
+	- IP Address: `10.27.190.1`
 	- Netmask: `255.255.255.240`
 	- DHCP End: `14`
 	
@@ -306,11 +306,15 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 
 Only 2 additional commands are needed in the HamWAN router. These commands tell the HamWAN router about the IP address subnets that we're using on our home network and our AREDN router's WAN and that those subnets are reachable via the ER-X's `eth4` port, which has IP address `192.168.88.2`.
 
+1. For this section, you'll need to use an SSH client on your PC. If you are using a Windows PC, I recommend using [Putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) as your SSH client. Macs and Linux host users can run `ssh` in the Terminal. Install an SSH client if you need to now, while your PC is connected to the Internet.
+
 1. Configure your PC's ethernet port to use DHCP if it is not already configured that way.
 
-1. Connect your PC to your HamWAN router's ethernet port.  If you are using a Windows PC, I recommend using [Putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) as your SSH client. Macs and Linux hosts have the `ssh` app available in the Terminal.
+1. Connect your PC to your HamWAN router's ethernet port.  
 
-1. SSH to your HamWAN router and enter these commands:
+1. SSH to your HamWAN router at IP address `192.168.88.1` on port `222`, __*not*__ the default SSH port `22`. Log in when prompted.
+
+1. Enter these commands:
 
 		/ip route
 		add distance=1 dst-address=192.168.73.0/24 gateway=192.168.88.2
@@ -325,27 +329,27 @@ We'll add to the DNS server configuration to enable name resolution of AREDN dev
 
 Remember those numbers you wrote down in the [Configure AREDN Router - Part 1](#configure-aredn-router---part-1)?  You're going to use those now. I'll use my numbers as an example in this part of the procedure.  Your numbers will be different - __*DO NOT*__ use my numbers in your configuration! It will not work.
 
-- IP Address: `172.27.190.1`
+- IP Address: `10.27.190.1`
 - Netmask: `255.255.255.240`
 - DHCP End: `14`
 
-The address I'll assign to my ER-X `eth2` port is the IP address as above, but instead of ending in `.1`, it'll end in the value of __DHCP End__, so my ER-X `eth2` IP address will be `172.27.190.14`. The ER-X router uses [CIDR notation](https://docs.netgate.com/pfsense/en/latest/book/network/understanding-cidr-subnet-mask-notation.html) for Netmask.  Use the translation table below to determine the CIDR notation equivalent of your netmask:
+The address I'll assign to my ER-X `eth2` port is the IP address as above, but instead of ending in `.1`, it'll end in the value of __DHCP End__, so my ER-X `eth2` IP address will be `10.27.190.14`. The ER-X router uses [CIDR notation](https://docs.netgate.com/pfsense/en/latest/book/network/understanding-cidr-subnet-mask-notation.html) for Netmask.  Use the translation table below to determine the CIDR notation equivalent of your netmask:
 
 - 255.255.255.248 = /29
 - 255.255.255.240 = /28
 - 255.255.255.224 = /27
 
-So, in my case the IP address with CIDR notation netmask I'll assign to my ER-X `eth2` port is `172.27.190.14/28`.
+So, in my case the IP address with CIDR notation netmask I'll assign to my ER-X `eth2` port is `10.27.190.14/28`.
 
 #### NAT and DNS
 
-1. Plug your PC into your WRS LAN port and log in to the ER-X router's web interface at https://192.168.73.1.
+1. Plug your PC into your WRS LAN port and log in to the ER-X router's web interface at `https://192.168.73.1`.
 1. Click the __CLI__ button to open the CLI.
 1. We'll change the IP address of the ER-X's `eth2` interface so it's in the same IP subnet as the AREDN router's LAN interface.  Then, we'll set up masquerade NAT on this interface. Enter these commands in the CLI (__*Change the* `eth2` *address below to your own value in the* `set interfaces...` *command below!*__):
 
 		configure
 		delete interfaces ethernet eth2 address 10.1.1.1/24
-		set interfaces ethernet eth2 address 172.27.190.14/28
+		set interfaces ethernet eth2 address 10.27.190.14/28
 		set service nat rule 5020 description 'masquerade for AREDN LAN'
 		set service nat rule 5020 outbound-interface eth2
 		set service nat rule 5020 type masquerade
@@ -528,6 +532,10 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall name HAMWAN_LOCAL rule 10 state new disable
 		set firewall name HAMWAN_LOCAL rule 10 state related enable
 		set interfaces ethernet eth4 firewall local HAMWAN_LOCAL
+		
+1. Save your changes and exit configure mode
+
+		commit;save;exit
 
 1. Why no firewall rules on our Home LAN interface?  You can add some if you like.  Generally, we trust the Home LAN.  By default, in the absence of any rules we create, all traffic is allowed. We have rules on our 3 WAN interfaces: ISP on `eth0`, AREDN WAN on `eth1` and HAMWAN on `eth4` that prevents unsolicited inbound traffic from untrusted networks. Likewise, we don't allow any unsolicited traffic from the AREDN LAN port.
 

@@ -283,10 +283,10 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 
 1. Get a pencil and paper and draw a table that looks like this:
 
-| Line | Value |
-| :--: | :--: |
-| 1 | ______________ |
-| 2 | ______________ |
+	| Line | Value |
+	| :--: | :--: |
+	| 1 | ______________ |
+	| 2 | ______________ |
 
 1. Write the __IP Address__ from *your* AREDN Setup page LAN section in the Value column for line 1. So using my LAN section as an example, the __IP Address__ is `10.27.190.1`. 
 

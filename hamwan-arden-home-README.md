@@ -308,7 +308,7 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 	| 1 | __10.27.190.1__ |
 	| 2 | __10.27.190.14/28__ |
 
-	Set the table aside.  We'll be using it later.
+	Set your table aside.  We'll be using it later.
 	
 1. If you are not within WiFi range of another AREDN user's node or don't want to connect to the AREDN wireless mesh, __uncheck__ the __Enable__ box in the __Mesh RF__ section.  
 1. In the __WAN__ section, select __Protocol: Static__ and configure as follows:
@@ -483,7 +483,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 		
 1. Apply these rules to our AREDN WAN interface inbound:
 
-		set interfaces ethernet eth1 firewall in AREDN_WAN_IN
+		set interfaces ethernet eth1 firewall in name AREDN_WAN_IN
 		
 1. The previous steps took care of traffic arriving on `eth1` and destined for some other network.  Now we need to add some protection for the router itself.  All traffic destined for the router itself from the AREDN WAN is dropped unless it is in reply to traffic originating from the ER-X.
 
@@ -496,7 +496,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall name AREDN_WAN_LOCAL rule 10 state invalid disable
 		set firewall name AREDN_WAN_LOCAL rule 10 state new disable
 		set firewall name AREDN_WAN_LOCAL rule 10 state related enable
-		set interfaces ethernet eth1 firewall local AREDN_WAN_LOCAL
+		set interfaces ethernet eth1 firewall local name AREDN_WAN_LOCAL
 		
 1. Let's restrict traffic inbound through the ER-X on `eth2`, the AREDN LAN port, to replies to traffic we initiated from our Home LAN:
 
@@ -509,7 +509,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall name AREDN_LAN_IN rule 10 state invalid disable
 		set firewall name AREDN_LAN_IN rule 10 state new disable
 		set firewall name AREDN_LAN_IN rule 10 state related enable
-		set interfaces ethernet eth2 firewall in AREDN_LAN_IN
+		set interfaces ethernet eth2 firewall in name AREDN_LAN_IN
 		
 1. And the same for traffic destined for the router itself from the AREDN LAN: Restrict inbound traffic to only conversations that were initiated by the router.
 
@@ -522,7 +522,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall name AREDN_LAN_LOCAL rule 10 state invalid disable
 		set firewall name AREDN_LAN_LOCAL rule 10 state new disable
 		set firewall name AREDN_LAN_LOCAL rule 10 state related enable
-		set interfaces ethernet eth2 firewall local AREDN_LAN_LOCAL
+		set interfaces ethernet eth2 firewall local name AREDN_LAN_LOCAL
 
 1. Finally, let's apply the same rules to the HamWAN interface.
 
@@ -535,7 +535,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall name HAMWAN_IN rule 10 state invalid disable
 		set firewall name HAMWAN_IN rule 10 state new disable
 		set firewall name HAMWAN_IN rule 10 state related enable
-		set interfaces ethernet eth4 firewall in HAMWAN_IN
+		set interfaces ethernet eth4 firewall in name HAMWAN_IN
 		set firewall name HAMWAN_LOCAL default-action drop
 		set firewall name HAMWAN_LOCAL rule 10 action accept
 		set firewall name HAMWAN_LOCAL rule 10 description 'Established and Related'
@@ -545,7 +545,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall name HAMWAN_LOCAL rule 10 state invalid disable
 		set firewall name HAMWAN_LOCAL rule 10 state new disable
 		set firewall name HAMWAN_LOCAL rule 10 state related enable
-		set interfaces ethernet eth4 firewall local HAMWAN_LOCAL
+		set interfaces ethernet eth4 firewall local name HAMWAN_LOCAL
 		
 1. Save your changes and exit configure mode
 

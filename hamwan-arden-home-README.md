@@ -412,6 +412,7 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 
 1. Make a group consisting of the IP subnets of our ER-X LAN IP subnets:
 
+		set firewall group network-group LANs description 'Local Nets'
 		set firewall group network-group LANs network 192.168.73.0/24
 		set firewall group network-group LANs network 192.168.77.0/24
 
@@ -559,7 +560,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 
 If you use the default configuration provided by HamWAN support, it will have the minimum configuration needed to NAT and provide Internet access. There are no firewall rules to protect the HamWAN router itself. Here's a set of rules that provide an increased level of security for your HamWAN router.
 
-1. SSH to your HamWAN router. At this point in our project, you should be able to ssh to your HamWAN router from your home network.
+1. SSH to your HamWAN router. At this point in our project, you should be able to ssh to your HamWAN router (`192.168.88.1` on port `222`) from your home network.
 
 	- Create an address list containing all possible HamWAN IP addresses. Enter these commands:
 	

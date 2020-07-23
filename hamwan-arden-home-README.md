@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20200722
+VERSION: 20200723
 
 AUTHOR:  Steve Magnuson AG7GN
 
@@ -77,7 +77,7 @@ ER-X `eth4`: `192.168.88.2/24`
 
 ## Definitions
 
-- __CLI__: Command Line Interface.  This is where you enter the commands on the networking devices.  Connecting to your device via [Secure Shell](https://www.ssh.com/ssh) (SSH) is the typical way to access the CLI. The ER-X router provides access to the CLI through it's web interface.
+- __CLI__: Command Line Interface.  This is where you enter the commands on the networking devices.  Connecting to your device via [Secure Shell](https://www.ssh.com/ssh) (SSH) is the typical way to access the CLI. The ER-X router provides access to the CLI through it's web interface or via SSH.
 - __DHCP__: [Dynamic Host Configuration Protocol](https://www.lifewire.com/what-is-dhcp-2625848) is a service provided by certain network devices that manages the IP addresses used by the devices on networks. Every device on a network must have a unique IP address in order to work, and DHCP provides a way to automatically assign IP address and related information to devices when they join a network. A DHCP server connected to your local network provides this IP address management service to the devices on your local network. We will be configuring a DHCP server on the ER-X router.
 - __DHCP-C__: DHCP Client. This is a network interface on a device that is configured to query a DHCP server to obtain it's IP address information. By default, the network interface on PCs, smartphones, tablets, etc. are DHCP clients. If DHCP is not used on a network interface, then the IP address information must be configured manually. This is called a static IP address configuration.
 - __DNS__: [Domain Name System](https://www.cloudflare.com/learning/dns/what-is-dns/) is the "phone book of the Internet". It translates between a name and an IP address. For example, google.com's IP address is 172.217.14.206.  We will be configuring a DNS server on the ER-X, and that DNS server will provide DNS services to your home network and allow you to access devices on the AREDN network by name.
@@ -85,7 +85,7 @@ ER-X `eth4`: `192.168.88.2/24`
 - __LAN__: [Local Area Network](https://www.howtogeek.com/353283/what-is-a-local-area-network-lan/). A network to which your devices are directly or wirelessly connected.
 - __M-NAT__: Masquerade [Network Address Translation](https://en.wikipedia.org/wiki/Network_address_translation) translates IP addresses between your private home and AREDN networks to a single public IP address provided to you by your ISP and by the HamWAN administrators.
 - __Policy Routing__: A device with an IP address on your network needs to talk to another device on the Internet.  Somehow, it needs to know how to get that traffic (a series of data packets) to the destination device's IP address.  Routers maintain tables of blocks of IP addresses called [subnets](https://www.subnetting.net/Tutorial.aspx). Routers perform the basic function of [routing](https://study-ccna.com/what-is-ip-routing/) packets. So, as long as your device knows how to contact it's local router, it sends the traffic to the router and the router then knows where to send it. We are going to configure some [policy routing](https://en.wikipedia.org/wiki/Policy-based_routing) on the ER-X router so we can make routing decisions based on criteria other than just the destination IP address.
-- __Private IP addresses__: [Private IP addresses](https://www.lifewire.com/what-is-a-private-ip-address-2625970) are certain ranges of IP addresses that are typically used on home networks. The ranges (blocks) of private IP address are defined in a standards document called [RFC1918](https://tools.ietf.org/html/rfc1918).
+- __Private IP addresses__: [Private IP addresses](https://www.lifewire.com/what-is-a-private-ip-address-2625970) are certain ranges of IP addresses that are typically used on home networks and are not allowed and will not work on the Internet (that's why we need NAT). The ranges (blocks) of private IP address are defined in a standards document called [RFC1918](https://tools.ietf.org/html/rfc1918).
 
 ## Roadmap
 
@@ -135,7 +135,7 @@ ER-X `eth4`: `192.168.88.2/24`
 1. Scroll down to the __DNS Forwarding__ section and make these changes:
 
 	- For DNS servers, select __Use servers provided by the Internet Service Provider__
-	- Uncheck __Use ony one LAN__.
+	- Uncheck __Only use one LAN__.
 	
 	![DNS and LAN Settings](img/wizard3.PNG)
 	
@@ -227,7 +227,7 @@ ER-X `eth4`: `192.168.88.2/24`
 		set system name-server '::1'
 		commit;save;exit
 
-1.	Make sure your PC's ethernet port to automatically obtain an IP address.  It should already be set this way.
+1.	Make sure your PC's ethernet port is set to automatically obtain an IP address.  It should already be set this way.
 		
 ### Reconfigure your Current WiFi/Router/Switch (WRS)
 
@@ -257,7 +257,7 @@ Every WRS manufacturer has a different procedure for what we're about to do, so 
 
 ### Test Home LAN Internet Connectivity
 
-Now we'll test your home LAN connection through the ER-X. Your PC should still be connected to your WRS.
+Now we'll test your home LAN connection through the ER-X. 
 
 1. Unplug your PC from the WRS.
 1. Plug your cable/DSL modem ethernet cable into your ER-X port `eth0`.
@@ -279,9 +279,9 @@ Your PC should still be in "Configure IP address automatically" mode at this sta
 	- 13 host direct
 	- 29 host direct
 	
-	This defines the number of devices at your QTH you anticipate connecting to the LAN interface of your ARDEN router. It has nothing to do with your home network or the number of devices on that network. For most users, 5 or 13 is adequate. Change it if desired, then __Save Changes__ and __Reboot__.
+	This defines the number of devices at your QTH you anticipate connecting to the LAN interface of your ARDEN router. It has nothing to do with your home network or the number of devices on that network. For most users, 5 or 13 is adequate. Change it if desired, then click __Save Changes__ and __Reboot__.
 	
-1. Once you're (back) into the AREDN router __Setup__ page, look at the LAN section again and note the __IP address__, the __Netmask__ and the __DHCP End__ number.  
+1. Once you're (back) on the AREDN router __Setup__ page, look at the LAN section again and note the __IP address__, the __Netmask__ and the __DHCP End__ number.  
 
 	For example, my LAN section looks like this (*Yours will be different!*):
 
@@ -298,7 +298,7 @@ Your PC should still be in "Configure IP address automatically" mode at this sta
 
 	Notice that IP addresses are of the form `x.x.x.x`.  Each of the `x`s is called an __octet__ because in binary they are 8 bit numbers and so can have a range in decimal from 0 to 255. 
 1. In the Value column of line 2, write the __*first 3 octets*__ of the __IP Address__.  Using my LAN section as an example, I'd write: `10.27.190.`  
-1. For the ***last*** octet of the address you entered in line 2, enter the __DHCP End__ number from ***your*** AREDN Setup page LAN section.  Using my LAN section as an example, I'd write __14__ and my line 2 value now looks like: `10.27.190.14`.
+1. For the ***last*** octet of the address you entered in line 2, enter the __DHCP End__ number from ***your*** AREDN Setup page LAN section.  Using my LAN section as an example, I'd write __14__ and my line 2 value is now: `10.27.190.14`.
 1. Finally, look at the __Netmask__ value from ***your*** AREDN Setup page LAN section. Netmasks can be depicted in different ways. The ER-X router uses [CIDR notation](https://docs.netgate.com/pfsense/en/latest/book/network/understanding-cidr-subnet-mask-notation.html) for Netmask.  That's why we need to convert the "dotted decimal" notation that the AREDN router uses to CIDR notation. 
 
 	- If the Netmask is `255.255.255.248`, then add **`/29`** to the end of the IP address you wrote in the Value column of line 2.
@@ -329,7 +329,7 @@ Your PC should still be in "Configure IP address automatically" mode at this sta
 1. Click __Save Changes__ and then click __Reboot__.
 1. Connect the __WAN__ port of your AREDN router to ER-X port `eth1`.
 1. With your PC still plugged in to the LAN port of your AREDN router, re-login to your AREDN router's web page.
-1. Verify you can get to the Internet from your PC: Open a browser and go to `google.com`, for example to test this.
+1. Verify you can get to the Internet from your PC: Open a browser and go to `google.com`, for example, to test this.
 
 	- *Don't move on to the next steps until you've verified Internet connectivity!* 		  Troubleshoot as needed to restore Internet service.
 	
@@ -389,9 +389,9 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 
 #### Policy Routing
 
-Standard IP routing uses the destination IP address as the sole criteria to determine where to send IP packets. The router maintains a table of destination IP networks for this purpose.  This is called the main routing table. We're going to implement Policy Routing so we can use other criteria to tell the router where to send certain packets.  We'll create a new routing table that our policies can use to forward packets.  Policies can selectively use either the main table or our new table depending on the criteria we define.
+Standard IP routing uses the destination IP address as the criteria to determine where to send IP packets. The router maintains a table of destination IP networks for this purpose.  This is called the main routing table. We're going to implement Policy Routing so we can use other criteria to tell the router where to send certain packets.  We'll create a new routing table that our policies can use to forward packets.  Policies can selectively use either the main table or our new table depending on the criteria we define.
 
-1. Back in the ER-X CLI, set up a new routing table (we'll call it table `88`) just for HamWAN. `0.0.0.0/0` means "all networks". This is called a [default route](https://en.wikipedia.org/wiki/Default_route).  If no other route in the routing table matches the destination IP address, then the router uses the default route to forward the packet.  Routing table 88's default route will point the HamWAN.
+1. Back in the ER-X CLI, set up a new routing table (we'll call it table `88`) just for HamWAN. `0.0.0.0/0` means "all networks". This is called a [default route](https://en.wikipedia.org/wiki/Default_route).  If no other route in the routing table matches the destination IP address, then the router uses the default route to forward the packet.  Routing table 88's default route will point to the HamWAN router.
 
 		set protocols static table 88 route 0.0.0.0/0 next-hop 192.168.88.1
 		
@@ -520,7 +520,7 @@ After running the wizard earlier, the ER-X firewall is configured such that all 
 		set firewall name AREDN_LAN_IN rule 10 state related enable
 		set interfaces ethernet eth2 firewall in name AREDN_LAN_IN
 		
-1. And the same for traffic destined for the router itself from the AREDN LAN: Restrict inbound traffic to only conversations that were initiated by the router.
+1. Do the same for traffic destined for the router itself from the AREDN LAN: Restrict inbound traffic to only conversations that were initiated by the router.
 
 		set firewall name AREDN_LAN_LOCAL default-action drop
 		set firewall name AREDN_LAN_LOCAL rule 10 action accept
@@ -553,7 +553,7 @@ After running the wizard earlier, the ER-X firewall is configured such that all 
 		set firewall name HAMWAN_IN rule 20 state new enable
 		set interfaces ethernet eth4 firewall in name HAMWAN_IN
 		
-1. And rules to protect the firewall from HamWAN.
+1. Add rules to protect the firewall from HamWAN.
 
 		set firewall name HAMWAN_LOCAL default-action drop
 		set firewall name HAMWAN_LOCAL rule 10 action accept

@@ -627,11 +627,11 @@ You can enable the Tunnel Server feature on your AREDN Node, which allows other 
 			nslookup wlan1.<callsign-hamwan_site>.hamwan.net
 		This command should return an IP address.  For example:
 		
-			root@AG7GN-AR150-HOME:~# nslookup wlan1.kf7vol-lookout.hamwan.net
+			root@AG7GN-AR150-HOME:~# nslookup wlan1.wb7fhc-lookout.hamwan.net
 			Server:	127.0.0.1
 			Address:	127.0.0.1#53
 
-			Name:      wlan1.kf7vol-lookout.hamwan.net
+			Name:      wlan1.wb7fhc-lookout.hamwan.net
 			Address 1: 44.25.143.59
 		Make sure it returns an IP address after the `Name:`.
 		

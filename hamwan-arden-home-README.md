@@ -464,7 +464,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 
 1.	Make a group of the private IP address defined in [RFC1918](https://tools.ietf.org/html/rfc1918).  All of our inside networks, as well as AREDN networks, are in these address ranges.
 
-		set firewall group network-group RFC1918_Nets description 'Private IP address blocks'
+		set firewall group network-group RFC1918_Nets description 'Private IP Addresses'
 		set firewall group network-group RFC1918_Nets network 10.0.0.0/8
 		set firewall group network-group RFC1918_Nets network 172.16.0.0/12
 		set firewall group network-group RFC1918_Nets network 192.168.0.0/16
@@ -474,7 +474,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall name AREDN_WAN_IN default-action drop
 		set firewall name AREDN_WAN_IN description 'AREDN WAN In'
 		set firewall name AREDN_WAN_IN rule 10 action drop
-		set firewall name AREDN_WAN_IN rule 10 description 'Drop traffic to RFC1918 Blocks'
+		set firewall name AREDN_WAN_IN rule 10 description 'Drop traffic to RFC1918 Nets'
 		set firewall name AREDN_WAN_IN rule 10 destination group network-group RFC1918_Nets
 		set firewall name AREDN_WAN_IN rule 10 log disable
 		set firewall name AREDN_WAN_IN rule 10 protocol all
@@ -493,7 +493,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 1. The previous steps took care of traffic arriving on `eth1` and destined for some other network.  Now we need to add some protection for the router itself.  All traffic destined for the router itself from the AREDN WAN is dropped unless it is in reply to traffic originating from the ER-X.
 
 		set firewall name AREDN_WAN_LOCAL default-action drop
-		set firewall name AREDN_WAN_LOCAL description 'AREDN WAN Local Established and Related'
+		set firewall name AREDN_WAN_LOCAL description 'Established and Related'
 		set firewall name AREDN_WAN_LOCAL rule 10 action accept 
 		set firewall name AREDN_WAN_LOCAL rule 10 log disable
 		set firewall name AREDN_WAN_LOCAL rule 10 protocol all
@@ -546,6 +546,8 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall name HAMWAN_IN rule 20 destination group port-group AREDN_SERVICES
 		set firewall name HAMWAN_IN rule 20 log disable
 		set firewall name HAMWAN_IN rule 20 protocol tcp
+		set firewall name HAMWAN_IN rule 20 state new enable
+		set firewall name HAMWAN_IN rule 20 state invalid disable
 		set interfaces ethernet eth4 firewall in name HAMWAN_IN
 		set firewall name HAMWAN_LOCAL default-action drop
 		set firewall name HAMWAN_LOCAL rule 10 action accept

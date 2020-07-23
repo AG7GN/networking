@@ -58,6 +58,8 @@ Here's what we're going to build:
 
 ![Home + AREDN + HamWAN Network Integration](img/home-aredn-hamwan-integration.png)
 
+Note the switch inserted between the AREDN Router/Switch and the Ubiquiti Router in the diagram. That's optional. You'll need it if you want to plug any ethernet devices directly into your AREDN LAN.  Otherwise, you can just run a cable directly from the AREDN Router/Switch LAN port to the Ubiquiti Router `eth2` port.  I'll assume you'll be running a cable and not inserting a switch as shown.  You can add a switch at a later date, and no additional configuration is needed on any of the devices in the diagram.
+
 ### Address Assignments
 
 We'll be assigning these IP addresses to the ER-X interfaces shown in this diagram:
@@ -353,13 +355,15 @@ Only 2 additional commands are needed in the HamWAN router. These commands tell 
 
 We'll add to the DNS server configuration to enable name resolution of AREDN devices and we'll enable masquerade NAT on the AREDN LAN interface. Enabling masquerade NAT will give the AREDN router the illusion that the packets are coming from a device on it's own LAN when in reality they are coming from a device on your home network. The NAT feature plus AREDN name resolution will allow any of your home LAN devices to access any AREDN devices by name or IP address.
 
-Remember that table you made in the [Configure AREDN Router - Part 1](#configure-aredn-router---part-1) step?  You're going to use it now. 
+
 
 #### NAT and DNS
 
+Remember that table you made in the [Configure AREDN Router - Part 1](#configure-aredn-router---part-1) step?  You're going to use it now. Wherever you see `<value from Line 1 in your table>` or `<value from line 2 in your table>` in the steps below, replace it with the values from your table. Don't include the `<>` symbols when you enter the commands. 
+
 1. Plug your PC into your WRS LAN port and log in to the ER-X router's web interface at `https://192.168.73.1`.
 1. Click the __CLI__ button to open the CLI.
-1. We'll change the IP address of the ER-X's `eth2` interface so it's in the same IP subnet as the AREDN router's LAN interface.  Then, we'll set up masquerade NAT on this interface. Enter these commands in the CLI (__*Change the* `eth2` *address below to your own value in the* `set interfaces...` *command below!*__):
+1. We'll change the IP address of the ER-X's `eth2` interface so it's in the same IP subnet as the AREDN router's LAN interface.  Then, we'll set up masquerade NAT on this interface. Enter these commands in the CLI:
 
 		configure
 		delete interfaces ethernet eth2 address 10.1.1.1/24
@@ -374,7 +378,7 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 
 1. Finally, we'll tell the ER-X DNS server to send requests for name resolution for names ending in `.local.mesh` to the AREDN router's LAN interface IP address (from your table) where your local AREDN node's DNS server is listening. 
 
-		set service dns forwarding options server=/local.mesh/<value from Line 2 in your table>
+		set service dns forwarding options server=/local.mesh/<value from Line 1 in your table>
 		commit;save
 
 1. Connect an ethernet cable from ER-X port `eth2` to the AREDN router LAN port.
@@ -383,7 +387,7 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 
 #### Policy Routing
 
-1. Back in the ER-X CLI, set up a new routing table (we'll call it table `88`) just for HamWAN.  `0.0.0.0/0` means "all networks". This is called a [default route](https://en.wikipedia.org/wiki/Default_route).
+1. Back in the ER-X CLI, set up a new routing table (we'll call it table `88`) just for HamWAN. `0.0.0.0/0` means "all networks". This is called a [default route](https://en.wikipedia.org/wiki/Default_route).
 
 		set protocols static table 88 route 0.0.0.0/0 next-hop 192.168.88.1
 		
@@ -405,10 +409,10 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 		set firewall group network-group HAMWAN_NETS network 44.34.128.0/21
 		set firewall group network-group HAMWAN_NETS network 44.36.240.0/21
 
-1. Make a group for the port used for AREDN Tunnels:
+1. Make a group for the ports used for AREDN services.  We'll add the AREDN tunnel service port to this group so it'll be ready to go should you decide to host a tunnel server on your AREDN router. 
 
-		set firewall group port-group AREDN_TUNNEL description 'AREDN Tunnel Port'
-		set firewall group port-group AREDN_TUNNEL port 5525
+		set firewall group port-group AREDN_SERVICES description 'AREDN Services via HamWAN'
+		set firewall group port-group AREDN_SERVICES port 5525
 
 1. Make a group consisting of the IP subnets of our ER-X LAN IP subnets:
 
@@ -430,22 +434,22 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 		set firewall modify POLICY_ROUTE rule 20 destination group network-group HAMWAN_NETS
 		set firewall modify POLICY_ROUTE rule 20 modify table 88
 
-1. Let's make sure that any tunnels from a __Tunnel Client__ on your local AREDN node to a __Tunnel Server__ elsewhere are built through the HamWAN path rather than via our regular ISP. AREDN tunnel client traffic will come from 192.168.77.2, the IP address of our AREDN node's WAN interface, and be sent to a destination port of `5525`, which we set earlier in `port-group AREDN_TUNNEL`.
+1. Let's make sure that any tunnels from a __Tunnel Client__ on your local AREDN node to a __Tunnel Server__ elsewhere are built through the HamWAN path rather than via our regular ISP. AREDN tunnel client traffic will come from `192.168.77.2`, the IP address of our AREDN node's WAN interface, and be sent to a destination port of `5525`.
 
 		set firewall modify POLICY_ROUTE rule 30 action modify
 		set firewall modify POLICY_ROUTE rule 30 description 'AREDN Tunnel Client Traffic via HamWAN'
 		set firewall modify POLICY_ROUTE rule 30 source address 192.168.77.2
 		set firewall modify POLICY_ROUTE rule 30 protocol tcp
-		set firewall modify POLICY_ROUTE rule 30 destination group port-group AREDN_TUNNEL
+		set firewall modify POLICY_ROUTE rule 30 destination port 5525
 		set firewall modify POLICY_ROUTE rule 30 modify table 88
 
-1. Let's set up a policy for handling traffic to/from a local AREDN __Tunnel Server__, should you decide to set one up (details later in this document).
+1. Let's set up a policy for handling traffic to/from local AREDN services you might want set up on your ARDEN router and have them be reachable via HamWAN.  For example, you might want to configure an a __tunnel server__. There are instructions for setting up a tunnel server later in this document.
 
 		set firewall modify POLICY_ROUTE rule 40 action modify
-		set firewall modify POLICY_ROUTE rule 40 description 'AREDN Tunnel Server Traffic via HamWAN'
+		set firewall modify POLICY_ROUTE rule 40 description 'AREDN Services Traffic via HamWAN'
 		set firewall modify POLICY_ROUTE rule 40 source address 192.168.77.2
 		set firewall modify POLICY_ROUTE rule 40 protocol tcp
-		set firewall modify POLICY_ROUTE rule 40 source group port-group AREDN_TUNNEL
+		set firewall modify POLICY_ROUTE rule 40 source group port-group AREDN_SERVICES
 		set firewall modify POLICY_ROUTE rule 40 modify table 88
 
 1.	Tell the ER-X to apply this `POLICY_ROUTE` to packets arriving inbound on ports `eth1` and `eth3`, and commit and save our changes:
@@ -525,7 +529,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall name AREDN_LAN_LOCAL rule 10 state related enable
 		set interfaces ethernet eth2 firewall local name AREDN_LAN_LOCAL
 
-1. Finally, let's apply the same rules to the HamWAN interface.
+1. Finally, let's apply the same rules to the HamWAN interface, and add some rules that will allow access to any AREDN services we want to make available on HamWAN.
 
 		set firewall name HAMWAN_IN default-action drop
 		set firewall name HAMWAN_IN rule 10 action accept
@@ -536,6 +540,12 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall name HAMWAN_IN rule 10 state invalid disable
 		set firewall name HAMWAN_IN rule 10 state new disable
 		set firewall name HAMWAN_IN rule 10 state related enable
+		set firewall name HAMWAN_IN rule 20 action accept
+		set firewall name HAMWAN_IN rule 20 description ‘Allow AREDN Services'
+		set firewall name HAMWAN_IN rule 20 destination address 192.168.77.2
+		set firewall name HAMWAN_IN rule 20 destination group port-group AREDN_SERVICES
+		set firewall name HAMWAN_IN rule 20 log disable
+		set firewall name HAMWAN_IN rule 20 protocol tcp
 		set interfaces ethernet eth4 firewall in name HAMWAN_IN
 		set firewall name HAMWAN_LOCAL default-action drop
 		set firewall name HAMWAN_LOCAL rule 10 action accept
@@ -703,15 +713,26 @@ How are you going to remember all of these IP addresses? Use names instead by ad
 
 	Say you want to enter a hostname for a computer named 'humbolt'. Earlier, in the `dnsmasq` configuration, we established a domain name of `home.lan`, so humbolt's full name will be `humbolt.home.lan`. Say it's IP address is `192.168.73.10`.
 
-1. Configure a static mapping for the host:
+1. Enter configuration mode:
+
+		configure
+
+1. Configure a static mapping for 'humbolt':
 
 		set system static-host-mapping host-name humbolt.home.lan inet 192.168.73.10
 
-1. Configure an alias, too:
+1. Configure an alias, too, so you can use just 'humbolt' rather than 'humbolt.home.lan':
 
 		set system static-host-mapping host-name humbolt.home.lan alias humbolt
 		
-	You can configure as many aliases as you want.
+1.	You can configure as many aliases as you want. Here are some useful entries for your network devices you might want to add:
+
+		set system static-host-mapping host-name erx.home.lan inet 192.168.73.1
+		set system static-host-mapping host-name erx.home.lan alias erx
+		set system static-host-mapping host-name erx.home.lan alias router
+		set system static-host-mapping host-name hamwan.home.lan inet 192.168.88.1
+		set system static-host-mapping host-name hamwan.home.lan alias hamwan
+		set system static-host-mapping host-name hamwan.home.lan alias hamwan-router
 
 1. Finish
 

@@ -26,10 +26,11 @@ Note that I'm talking about a MODEM here, not an integrated modem and router pro
 - Familiarity with configuring your home router, HamWAN and AREDN equipment.
 - Cat5 or better ethernet cables of suitable length.
 - PC with a wired ethernet port, and you know how to configure the ethernet port on your PC with a static IP address or an automatically assigned IP (DHCP) address. We'll be doing both in this procedure.
+- If the PC you're going to be using is running Windows, I recommend installing the free SSH application called [Putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html).  If your PC is running Linux or is a Mac, then SSH is available in the Terminal.
 
 ## Background
 
-A typical home network consists of a cable or DSL modem and a WiFi router. The router provides Network Address Translation (NAT), firewall and IP address management (using Dynamic Host Configuration Protocol, or DHCP) services. Residential class routers typically require minimal networking knowledge and configuration to get you on the Internet.
+A typical home network consists of a cable or DSL modem and a WiFi router. The router provides Network Address Translation (NAT), firewall and IP address management (using Dynamic Host Configuration Protocol, or DHCP) services. These residential class routers typically require minimal networking knowledge and configuration to get you on the Internet.
 
 When we add AREDN and/or HamWAN to the mix, things get complicated quickly. Some additional knowledge is required in order for these networks to coexist without interfering with each other or, in the case of AREDN and HamWAN, stray too far from Part 97 rules. Making this work also requires an enterprise class router - your average Best Buy router isn't going to work.
 
@@ -40,17 +41,17 @@ This document describes one method to integrate these 3 networks at your QTH in 
 - Allows devices on your home network to access your local AREDN devices or devices on AREDN mesh by IP address or by device (host) name, but prevents AREDN devices from accessing your home network.
 - Allows devices on your AREDN network to use HamWAN for Internet access.
 
-I won't explain every networking principle underlying the design described in this document because the document would be a hundred pages long and I don't have that kind of time!  Where appropriate, I've provided links to external resources where you can learn more about the underlying technology.
+I won't explain every networking principle underlying the design described in this document because the document would be a hundred pages long and I don't have that kind of time!  Where appropriate, I've provided links to external resources where you can learn more about the underlying technology.  To open these links in a new browser tab, `Command+click` them (on a Mac) or `Control+click` them (on Windows/Linux).
 
-For HamWAN and Ubiquiti equipment, I'll provide the necessary commands or instructions to make this work, so you will need command line interface (CLI) access to your HamWAN and Ubiquiti equipment.  The Ubiquiti ER-X router provides a CLI in it's web interface or via [Secure Shell](https://www.ssh.com/ssh/) (SSH).  For the HamWAN router, use SSH to get to the CLI. There are minimal changes needed to the HamWAN router and you can use the `Winbox` application (if you're using a Windows PC) instead of SSH to make those changes. This procedure only documents using SSH to edit the HamWAN router.
+For HamWAN and Ubiquiti equipment, I'll provide the necessary commands or instructions to make this work, so you will need command line interface (CLI) access to your HamWAN and Ubiquiti equipment.  The Ubiquiti ER-X router provides a CLI in it's web interface or via [Secure Shell](https://www.ssh.com/ssh/) (SSH).  For the HamWAN router, use SSH to get to the CLI. There are minimal changes needed to the HamWAN router and you can use the `Winbox` application (if you're using a Windows PC) instead of SSH to make those changes. However, this procedure only documents using SSH to configure the HamWAN router.
 
 I'm making these assumptions about your current network:
 
 - You have a typical Internet connection consisting of a cable or DSL modem and a *separate* WiFi/router/switch. Your WiFi/router/switch's WAN port is plugged into the cable or DSL modem's "LAN" or "NETWORK" port and it is working correctly.
 - You have one or both of these:
-	- A working HamWAN router that is connected to the HamWAN network but not connected to your home network.
+	- A working HamWAN router that is connected to the HamWAN network per the [recommended configuration](http://hamwan.org/Standards/Network%20Engineering/Client%20Node%20Configuration.html), but it is not connected to your home network.
 	- A working AREDN router that is not connected to your home network. See the [AREDN Getting Started Guide](https://arednmesh.readthedocs.io/en/latest/arednGettingStarted/aredn_overview.html) to install the AREDN image on your hardware.
-- You have a new Ubiquiti ER-X that is still at factory default settings. You can [reset to factory defaults](https://help.ubnt.com/hc/en-us/articles/205202620-EdgeRouter-Reset-to-Factory-Defaults) if necessary.
+- You have a new Ubiquiti ER-X that is still at factory default settings. You can [reset it to factory defaults](https://help.ubnt.com/hc/en-us/articles/205202620-EdgeRouter-Reset-to-Factory-Defaults) if necessary.
 
 ## Diagram
 
@@ -58,7 +59,7 @@ Here's what we're going to build:
 
 ![Home + AREDN + HamWAN Network Integration](img/home-aredn-hamwan-integration.png)
 
-Note the switch inserted between the AREDN Router/Switch and the Ubiquiti Router in the diagram. That's optional. You'll need it if you want to plug any ethernet devices (a camera, for example) directly into your AREDN LAN.  Otherwise, you can just run a cable directly from the AREDN Router/Switch LAN port to the Ubiquiti Router `eth2` port.  I'll assume you'll be running a cable and not inserting a switch as shown.  You can add a switch at a later date, and no additional configuration is needed on any of the devices in the diagram.
+Note the switch inserted between the AREDN Router/Switch and the Ubiquiti ER-X Router in the diagram. That's optional. You'll need it if you want to plug any ethernet devices (a camera, for example) directly into your AREDN LAN. Otherwise, you can just run a cable directly from the AREDN Router/Switch LAN port to the Ubiquiti Router `eth2` port.  Whether or not you use a switch makes no difference as far as this procedure is concerned.  The steps are the same regardless. You can add a switch at a later date and no additional configuration is needed on any of the devices in the diagram.  You can use any inexpensive standard ethernet switch. If you don't use a switch, you'll run an ethernet cable from the LAN port of the AREDN Router/Switch to port `eth2` on the ER-X router.
 
 ### Address Assignments
 
@@ -68,7 +69,7 @@ ER-X `eth0`: Address assigned via DHCP from your ISP
 
 ER-X `eth1`: `192.168.77.1/24` 
 
-ER-X `eth2`: `10.1.1.1/24 (we will change this value later)`
+ER-X `eth2`: `10.1.1.1/24` (we will change this address once when we set up your ARDEN router)
 
 ER-X `eth3`: `192.168.73.1/24`
 
@@ -76,25 +77,25 @@ ER-X `eth4`: `192.168.88.2/24`
 
 ## Definitions
 
-- __CLI__: Command Line Interface.  This is where you enter the commands on the networking devices.  Connecting to your device via [Secure Shell](https://www.ssh.com/ssh/) (SSH) is the typical way to access the CLI.
-- __DHCP__: [Dynamic Host Configuration Protocol](https://www.lifewire.com/what-is-dhcp-2625848) is a service provided by certain network devices that manages the IP addresses used by the devices on networks. Every device on a network must have an IP address in order to work, and DHCP provides a way to automatically assign IP address and related information to devices when they join a network. A DHCP server connected to your local network provides this IP address management service to the devices on your local network. We will be configuring a DHCP server on the ER-X router.
+- __CLI__: Command Line Interface.  This is where you enter the commands on the networking devices.  Connecting to your device via [Secure Shell](https://www.ssh.com/ssh) (SSH) is the typical way to access the CLI. The ER-X router provides access to the CLI through it's web interface.
+- __DHCP__: [Dynamic Host Configuration Protocol](https://www.lifewire.com/what-is-dhcp-2625848) is a service provided by certain network devices that manages the IP addresses used by the devices on networks. Every device on a network must have a unique IP address in order to work, and DHCP provides a way to automatically assign IP address and related information to devices when they join a network. A DHCP server connected to your local network provides this IP address management service to the devices on your local network. We will be configuring a DHCP server on the ER-X router.
 - __DHCP-C__: DHCP Client. This is a network interface on a device that is configured to query a DHCP server to obtain it's IP address information. By default, the network interface on PCs, smartphones, tablets, etc. are DHCP clients. If DHCP is not used on a network interface, then the IP address information must be configured manually. This is called a static IP address configuration.
 - __DNS__: [Domain Name System](https://www.cloudflare.com/learning/dns/what-is-dns/) is the "phone book of the Internet". It translates between a name and an IP address. For example, google.com's IP address is 172.217.14.206.  We will be configuring a DNS server on the ER-X, and that DNS server will provide DNS services to your home network and allow you to access devices on the AREDN network by name.
 - __Firewall__: A [firewall](https://www.cisco.com/c/en/us/products/security/firewalls/what-is-a-firewall.html) protects your network from devices on other networks by monitoring all of the network traffic (packets) flowing between your network and the Internet (for example), and only allows traffic that you define to pass. We will be configuring a firewall on the ER-X router.
 - __LAN__: [Local Area Network](https://www.howtogeek.com/353283/what-is-a-local-area-network-lan/). A network to which your devices are directly or wirelessly connected.
 - __M-NAT__: Masquerade [Network Address Translation](https://en.wikipedia.org/wiki/Network_address_translation) translates IP addresses between your private home and AREDN networks to a single public IP address provided to you by your ISP and by the HamWAN administrators.
-- __Policy__: A device with an IP address on your network needs to talk to another device on the Internet.  Somehow, it needs to know how to get that traffic (a series of data packets) to the destination device's IP address.  Routers maintain tables of blocks of IP addresses called [subnets](https://www.subnetting.net/Tutorial.aspx). Routers perform the basic function of [routing](https://study-ccna.com/what-is-ip-routing/) packets. So, as long as your device knows how to contact it's local router, it sends the traffic to the router and the router then knows where to send it. We are going to configure some [policy routing](https://en.wikipedia.org/wiki/Policy-based_routing) on the ER-X router so we can make routing decisions based on criteria other than just the destination IP address.
-- __Private IP addresses__: [Private IP addresses](https://www.lifewire.com/what-is-a-private-ip-address-2625970) are certain ranges of IP addresses that are typically used on home networks. The blocks of private IP address are defined in a standards document called [RFC1918](https://tools.ietf.org/html/rfc1918).
+- __Policy Routing__: A device with an IP address on your network needs to talk to another device on the Internet.  Somehow, it needs to know how to get that traffic (a series of data packets) to the destination device's IP address.  Routers maintain tables of blocks of IP addresses called [subnets](https://www.subnetting.net/Tutorial.aspx). Routers perform the basic function of [routing](https://study-ccna.com/what-is-ip-routing/) packets. So, as long as your device knows how to contact it's local router, it sends the traffic to the router and the router then knows where to send it. We are going to configure some [policy routing](https://en.wikipedia.org/wiki/Policy-based_routing) on the ER-X router so we can make routing decisions based on criteria other than just the destination IP address.
+- __Private IP addresses__: [Private IP addresses](https://www.lifewire.com/what-is-a-private-ip-address-2625970) are certain ranges of IP addresses that are typically used on home networks. The ranges (blocks) of private IP address are defined in a standards document called [RFC1918](https://tools.ietf.org/html/rfc1918).
 
 ## Roadmap
 
 1. Configure the ER-X so it can become the router/firewall for your network instead of your current WiFi/router/switch.
 
-1. Convert your current WiFi/router/switch to be a WiFi/switch operating in "bridge" mode.
+1. Convert your current WiFi/router/switch to be a WiFi/switch operating in "bridge" or  "access point" mode.
 1. Insert the ER-X between your cable/DSL modem and your WiFi/switch.
 1. Verify your home network devices can reach the Internet in the new configuration.
 1. Make some changes to your AREDN and HamWAN routers so they can integrate with your home network.
-1. Add to the ER-X configuration to make it ready to accept connection to your HamWAN router and AREDN router.
+1. Add to the ER-X configuration to make it work with your HamWAN and AREDN routers.
 1. Connect your HamWAN and AREDN routers to the ER-X.
 1. Finish the ER-X configuration.
 
@@ -105,13 +106,13 @@ ER-X `eth4`: `192.168.88.2/24`
 1. It's likely that when your ER-X router arrives, it'll have an older version of firmware. Using a PC with Internet access, visit the EdgeRouter [downloads](https://www.ui.com/download/edgemax) page. You'll see a lot of files on that page.  We're interested in the most recent version for the `EdgeRouter ER-X/ER-X-SFP/EP-R6/ER-10X` models.  As of this writing, the latest version is `v2.0.8-hotfix.1`. You may see more than one firmware file for the ER-X listed.  Look for the most recent version. Click the corresponding download link and save it to your PC. Use this same PC to configure the ER-X in the following steps, or transfer the downloaded firmware file to the PC you'll be using in the following steps.
 
 1. You'll need to initially configure the ER-X in isolation from your home network - just the ER-X, a PC and an ethernet cable.  
-	- [Watch this video](https://www.youtube.com/watch?v=aECPxlT6Qq4) for a good overview of how to connect your PC to the ER-X and how to use the "wizard" in the ER-X web interface to do the initial configuration.
-
-		__NOTE: *We'll be configuring the wizard differently than what is shown in the video!*__ Watch the video just to get a general idea of the steps. Don't execute the steps with the settings shown on the video on your own router.
+	- [Watch this video](https://www.youtube.com/watch?v=aECPxlT6Qq4) for a good overview of how to connect your PC to the ER-X and how to use the "wizard" in the ER-X web interface to do the initial configuration. 
+	
+	__NOTE: *We'll be configuring the wizard differently than what is shown in the video!*__ Watch the video just to get a general idea of the steps. Don't execute the steps with the settings shown on the video on your own router.
 		
 1. Connect your PC to the ER-X `eth0` port and assign your PC's ethernet port the static IP address (`192.168.1.2`) as shown in the video.
 
-__NOTE__: The ER-X web interface uses pop up windows and your browser may be blocking those.  If you find that certain screens are not what they shodEnable pop-ups in your browser while configuring the ER-X
+	__NOTE__: The ER-X web interface uses pop up windows and your browser may be blocking those.  If you find that certain screens are not what they should be (missing buttons for example), enable pop-ups in your browser while configuring the ER-X.
 1. Log in to the ER-X web page at `192.168.1.1` as shown in the video. The default username and password are both `ubnt`.
 1. Let's see if we need to update the firmware on your ER-X.  In the upper left of the web page and to the right of the EdgeMax icon, it'll tell you the version. If the version shown is older than the version you downloaded in the first step, upgrade the firmware on your ER-X as follows:
 
@@ -160,7 +161,7 @@ __NOTE__: The ER-X web interface uses pop up windows and your browser may be blo
 	
 1. Move your PC's ethernet cable from `eth0` to `eth1` on the ER-X and change your ethernet adapter's IP address setting to "Obtain an IP address automatically" as shown in the video. 
 
-1. Wait a minute or so for the router come back up, then go to https://192.168.77.1 in your browser. Log in with user `ubnt` and your new password.
+1. Wait a minute or so for the router come back up, then go to `https://192.168.77.1` in your browser. Log in with user `ubnt` and your new password.
 
 1. Click the __CLI__ button (CLI is Command Line Interface) in the upper right, and log in again as user `ubnt` and your new password. The rest of the ER-X configuration will be done in the CLI.
 
@@ -226,11 +227,11 @@ __NOTE__: The ER-X web interface uses pop up windows and your browser may be blo
 		set system name-server '::1'
 		commit;save;exit
 
-1.	Set your PC's ethernet port to automatically obtain an IP address.
+1.	Make sure your PC's ethernet port to automatically obtain an IP address.  It should already be set this way.
 		
 ### Reconfigure your Current WiFi/Router/Switch (WRS)
 
-*These steps will disable Internet at your QTH.*  
+*These steps will disable Internet at your QTH!*  
 
 I'm going to call your current "WiFi/Router/Switch" __WRS__ from now on to save typing.
 
@@ -258,14 +259,17 @@ Every WRS manufacturer has a different procedure for what we're about to do, so 
 
 Now we'll test your home LAN connection through the ER-X. Your PC should still be connected to your WRS.
 
+1. Unplug your PC from the WRS.
 1. Plug your cable/DSL modem ethernet cable into your ER-X port `eth0`.
 1. Plug your ER-X port `eth3` into a LAN (*not* WAN) port on your WRS.
-1. Plug your PC into a LAN port on your WRS.
+1. Plug your PC back into your WRS. Make sure you plug it in to a LAN port.
 1. Verify your PC obtains IP address information (`192.168.73.x`) from the ER-X and see if you can get to the Internet.  NOTE: You may need to reboot your cable/DSL modem for this to work.  
 	
 	- *Don't move on to the next steps until you've verified Internet connectivity!* 		  Troubleshoot as needed to restore Internet service.
 
 ### Configure the AREDN Router
+
+Your PC should still be in "Configure IP address automatically" mode at this stage.
 
 1. Attach your PC to the LAN port of your AREDN router and log in to the AREDN router's web interface at __http://localnode.local.mesh:8080/__. You should have no other ethernet connections to your AREDN router at this point.
 1. Click __Setup__ (log in if prompted). Look at the __LAN__ section. The __LAN Mode__ dropdown has these choices:
@@ -275,7 +279,7 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 	- 13 host direct
 	- 29 host direct
 	
-	This defines the number of devices you anticipate connecting to the LAN interface of your ARDEN router. It has nothing to do with your home network or the number of devices on that network. For most users, 5 or 13 is adequate. Change it if desired, then __Save Changes__ and __Reboot__.
+	This defines the number of devices at your QTH you anticipate connecting to the LAN interface of your ARDEN router. It has nothing to do with your home network or the number of devices on that network. For most users, 5 or 13 is adequate. Change it if desired, then __Save Changes__ and __Reboot__.
 	
 1. Once you're (back) into the AREDN router __Setup__ page, look at the LAN section again and note the __IP address__, the __Netmask__ and the __DHCP End__ number.  
 
@@ -290,11 +294,11 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 	| 1 | ______________ |
 	| 2 | ______________ |
 
-1. Write the __IP Address__ from *your* AREDN Setup page LAN section in the Value column for line 1. So using my LAN section as an example, the __IP Address__ is `10.27.190.1`. 
+1. Write the __IP Address__ from *your* AREDN Setup page LAN section in the Value column for line 1. So using my LAN section as an example, I would write `10.27.190.1`. 
 
 	Notice that IP addresses are of the form `x.x.x.x`.  Each of the `x`s is called an __octet__ because in binary they are 8 bit numbers and so can have a range in decimal from 0 to 255. 
 1. In the Value column of line 2, write the __*first 3 octets*__ of the __IP Address__.  Using my LAN section as an example, I'd write: `10.27.190.`  
-1. For the ***last*** octet of the address you entered in line 2, enter the __DHCP End__ number from ***your*** AREDN Setup page LAN section.  Using my LAN section as an example, I'd write __14__ and my line 2 value should now be: `10.27.190.14`.
+1. For the ***last*** octet of the address you entered in line 2, enter the __DHCP End__ number from ***your*** AREDN Setup page LAN section.  Using my LAN section as an example, I'd write __14__ and my line 2 value now looks like: `10.27.190.14`.
 1. Finally, look at the __Netmask__ value from ***your*** AREDN Setup page LAN section. Netmasks can be depicted in different ways. The ER-X router uses [CIDR notation](https://docs.netgate.com/pfsense/en/latest/book/network/understanding-cidr-subnet-mask-notation.html) for Netmask.  That's why we need to convert the "dotted decimal" notation that the AREDN router uses to CIDR notation. 
 
 	- If the Netmask is `255.255.255.248`, then add **`/29`** to the end of the IP address you wrote in the Value column of line 2.
@@ -325,7 +329,7 @@ Now we'll test your home LAN connection through the ER-X. Your PC should still b
 1. Click __Save Changes__ and then click __Reboot__.
 1. Connect the __WAN__ port of your AREDN router to ER-X port `eth1`.
 1. With your PC still plugged in to the LAN port of your AREDN router, re-login to your AREDN router's web page.
-1. Verify you can get to the Internet from your PC.
+1. Verify you can get to the Internet from your PC: Open a browser and go to `google.com`, for example to test this.
 
 	- *Don't move on to the next steps until you've verified Internet connectivity!* 		  Troubleshoot as needed to restore Internet service.
 	
@@ -355,14 +359,12 @@ Only 2 additional commands are needed in the HamWAN router. These commands tell 
 
 We'll add to the DNS server configuration to enable name resolution of AREDN devices and we'll enable masquerade NAT on the AREDN LAN interface. Enabling masquerade NAT will give the AREDN router the illusion that the packets are coming from a device on it's own LAN when in reality they are coming from a device on your home network. The NAT feature plus AREDN name resolution will allow any of your home LAN devices to access any AREDN devices by name or IP address.
 
-
-
 #### NAT and DNS
 
-Remember that table you made in the [Configure AREDN Router - Part 1](#configure-aredn-router---part-1) step?  You're going to use it now. Wherever you see `<value from Line 1 in your table>` or `<value from line 2 in your table>` in the steps below, replace it with the values from your table. Don't include the `<>` symbols when you enter the commands. 
+Remember that table you made in the [Configure AREDN Router - Part 1](#configure-aredn-router---part-1) step?  You're going to use it now. Wherever you see `<value from Line 1 in your table>` or `<value from line 2 in your table>` in the steps below, replace it with the values from your table. Don't include the `<>` symbols when you enter the values. 
 
 1. Plug your PC into your WRS LAN port and log in to the ER-X router's web interface at `https://192.168.73.1`.
-1. Click the __CLI__ button to open the CLI.
+1. Click the __CLI__ button to open the CLI.  Alternatively, you can SSH to your ER-X router using Putty (Windows) or ssh (Mac, Linux) in the Terminal to access the CLI.  The ER-X uses the standard ssh port 22.
 1. We'll change the IP address of the ER-X's `eth2` interface so it's in the same IP subnet as the AREDN router's LAN interface.  Then, we'll set up masquerade NAT on this interface. Enter these commands in the CLI:
 
 		configure
@@ -387,11 +389,13 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 
 #### Policy Routing
 
-1. Back in the ER-X CLI, set up a new routing table (we'll call it table `88`) just for HamWAN. `0.0.0.0/0` means "all networks". This is called a [default route](https://en.wikipedia.org/wiki/Default_route).
+Standard IP routing uses the destination IP address as the sole criteria to determine where to send IP packets. The router maintains a table of destination IP networks for this purpose.  This is called the main routing table. We're going to implement Policy Routing so we can use other criteria to tell the router where to send certain packets.  We'll create a new routing table that our policies can use to forward packets.  Policies can selectively use either the main table or our new table depending on the criteria we define.
+
+1. Back in the ER-X CLI, set up a new routing table (we'll call it table `88`) just for HamWAN. `0.0.0.0/0` means "all networks". This is called a [default route](https://en.wikipedia.org/wiki/Default_route).  If no other route in the routing table matches the destination IP address, then the router uses the default route to forward the packet.  Routing table 88's default route will point the HamWAN.
 
 		set protocols static table 88 route 0.0.0.0/0 next-hop 192.168.88.1
 		
-1. Make a group consisting of all of the HamWAN IP address blocks:
+1. Make a "network group" consisting of all of the IP address blocks (subnets) used by HamWAN:
 
 		set firewall group network-group HAMWAN_NETS description 'HamWAN Networks'
 		set firewall group network-group HAMWAN_NETS network 44.12.6.0/24
@@ -409,12 +413,12 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 		set firewall group network-group HAMWAN_NETS network 44.34.128.0/21
 		set firewall group network-group HAMWAN_NETS network 44.36.240.0/21
 
-1. Make a group for the ports used for AREDN services.  We'll add the AREDN tunnel service port to this group so it'll be ready to go should you decide to host a tunnel server on your AREDN router. 
+1. Make a "port group" for the ports used for AREDN services.  We'll add the AREDN tunnel service port to this group so it'll be ready to go should you decide to host a tunnel server on your AREDN router. 
 
 		set firewall group port-group AREDN_SERVICES description 'AREDN Services via HamWAN'
 		set firewall group port-group AREDN_SERVICES port 5525
 
-1. Make a group consisting of the IP subnets of our ER-X LAN IP subnets:
+1. Make a network group consisting of the IP subnets of our ER-X's LAN IP subnets:
 
 		set firewall group network-group LANs description 'Local Nets'
 		set firewall group network-group LANs network 192.168.73.0/24
@@ -427,14 +431,14 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 		set firewall modify POLICY_ROUTE rule 10 destination group network-group LANs
 		set firewall modify POLICY_ROUTE rule 10 modify table main
 		
-1. Any traffic destined for a HamWAN IP address should use our HamWAN path:
+1. Any traffic destined for a HamWAN IP address from our home networks should use our new routing table for the HamWAN path:
 
 		set firewall modify POLICY_ROUTE rule 20 action modify
 		set firewall modify POLICY_ROUTE rule 20 description 'HamWAN destinations'
 		set firewall modify POLICY_ROUTE rule 20 destination group network-group HAMWAN_NETS
 		set firewall modify POLICY_ROUTE rule 20 modify table 88
 
-1. Let's make sure that any tunnels from a __Tunnel Client__ on your local AREDN node to a __Tunnel Server__ elsewhere are built through the HamWAN path rather than via our regular ISP. AREDN tunnel client traffic will come from `192.168.77.2`, the IP address of our AREDN node's WAN interface, and be sent to a destination port of `5525`.
+1. Let's make sure that any tunnels from a __Tunnel Client__ on your local AREDN node to a __Tunnel Server__ elsewhere are built through the HamWAN path rather than via our regular ISP. AREDN tunnel client traffic will come from `192.168.77.2`, the IP address of our AREDN node's WAN interface, and be sent to a destination port of `5525`.  
 
 		set firewall modify POLICY_ROUTE rule 30 action modify
 		set firewall modify POLICY_ROUTE rule 30 description 'AREDN Tunnel Client Traffic via HamWAN'
@@ -452,7 +456,7 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 		set firewall modify POLICY_ROUTE rule 40 source group port-group AREDN_SERVICES
 		set firewall modify POLICY_ROUTE rule 40 modify table 88
 
-1.	Tell the ER-X to apply this `POLICY_ROUTE` to packets arriving inbound on ports `eth1` and `eth3`, and commit and save our changes:
+1.	Tell the ER-X to apply this `POLICY_ROUTE` to packets arriving inbound on ports `eth1` (from our AREDN WAN) and `eth3`(from our home network), and commit and save our changes:
 
 		set interfaces ethernet eth1 firewall in modify POLICY_ROUTE
 		set interfaces ethernet eth3 firewall in modify POLICY_ROUTE
@@ -460,16 +464,16 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 
 #### Firewall Enhancements
 
-After running the wizard earlier, the firewall is configured such that all traffic inbound on the Internet facing interface `eth0` is dropped unless it is in reply to traffic sent by a device on our AREDN or Home LANs. Traffic arriving on `eth0` that is in reply to traffic we originated from our inside devices is called "established and related".  The firewall keeps track of all of the conversations our devices are having and it knows which IP address initiated each conversation.  If our inside device initiates a conversation, the firewall assumes that any replies coming in from the Internet related to that conversation are OK and are allowed to pass. When you are on a PC on your home LAN and open a web browser and connect to your bank's website, for example, your PC *initiated* that conversation with your bank's website.  From then on, any packets from your bank's website to your PC that are part of that conversation ('established and related') are allowed from the Internet.  Note that the firewall rules below have numbers.  Those numbers are used to tell the firewall the order in which to evaluate the rules.  Firewall rule order is important.
+After running the wizard earlier, the ER-X firewall is configured such that all traffic inbound on the Internet facing interface `eth0` is dropped unless it is in reply to traffic sent by a device on our AREDN or Home LANs. Traffic arriving on `eth0` that is in reply to traffic we originated from our inside devices is called "established and related".  The firewall keeps track of all of the conversations our devices are having and it knows which IP address initiated each conversation.  If our inside device initiates a conversation, the firewall assumes that any replies coming in from the Internet related to that conversation are OK and are allowed to pass. When you are on a PC on your home LAN and open a web browser and connect to your bank's website, for example, your PC *initiated* that conversation with your bank's website.  From then on, any packets from your bank's website to your PC that are part of that conversation ('established and related') are allowed from the Internet.  Note that the firewall rules below have numbers.  Those numbers are used to tell the firewall the order in which to evaluate the rules.  Firewall rule order is important.
 
-1.	Make a group of the private IP address defined in [RFC1918](https://tools.ietf.org/html/rfc1918).  All of our inside networks, as well as AREDN networks, are in these address ranges.
+1.	Make a network group of the private IP address defined in [RFC1918](https://tools.ietf.org/html/rfc1918).  All of our inside networks, as well as AREDN networks, are in these address ranges.
 
 		set firewall group network-group RFC1918_Nets description 'Private IP Addresses'
 		set firewall group network-group RFC1918_Nets network 10.0.0.0/8
 		set firewall group network-group RFC1918_Nets network 172.16.0.0/12
 		set firewall group network-group RFC1918_Nets network 192.168.0.0/16
 
-1. Prevent AREDN IP addresses from reaching private IP addresses via the AREDN WAN port.  Our Home LAN IP address block is in this group, so this isolates the Home LAN from traffic originating from AREDN.
+1. Prevent AREDN IP addresses from reaching private IP addresses via the AREDN WAN port.  Our Home LAN IP address block is in this group, so this isolates our home LAN from traffic originating from AREDN.
 
 		set firewall name AREDN_WAN_IN default-action drop
 		set firewall name AREDN_WAN_IN description 'AREDN WAN In'
@@ -479,7 +483,7 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall name AREDN_WAN_IN rule 10 log disable
 		set firewall name AREDN_WAN_IN rule 10 protocol all
 
-1. Allow anything else (that is, packets destined for public IP addresses - The Internet):
+1. Allow anything else (that is, packets destined for public IP addresses - the Internet or HamWAN):
 
 		set firewall name AREDN_WAN_IN rule 99 action accept
 		set firewall name AREDN_WAN_IN rule 99 description 'Permit all'
@@ -547,8 +551,10 @@ After running the wizard earlier, the firewall is configured such that all traff
 		set firewall name HAMWAN_IN rule 20 log disable
 		set firewall name HAMWAN_IN rule 20 protocol tcp
 		set firewall name HAMWAN_IN rule 20 state new enable
-		set firewall name HAMWAN_IN rule 20 state invalid disable
 		set interfaces ethernet eth4 firewall in name HAMWAN_IN
+		
+1. And rules to protect the firewall from HamWAN.
+
 		set firewall name HAMWAN_LOCAL default-action drop
 		set firewall name HAMWAN_LOCAL rule 10 action accept
 		set firewall name HAMWAN_LOCAL rule 10 description 'Established and Related'
@@ -564,15 +570,17 @@ After running the wizard earlier, the firewall is configured such that all traff
 
 		commit;save;exit
 
-1. Why no firewall rules on our Home LAN interface?  You can add some if you like.  Generally, we trust the Home LAN.  By default, in the absence of any rules we create, all traffic is allowed. We have rules on our 3 WAN interfaces: ISP on `eth0`, AREDN WAN on `eth1` and HAMWAN on `eth4` that prevents unsolicited inbound traffic from untrusted networks. Likewise, we don't allow any unsolicited traffic from the AREDN LAN port.
+1. Why no firewall rules on our Home LAN interface?  You can add some if you like.  Generally, we trust the Home LAN.  By default, in the absence of any rules we create, all traffic is allowed. We have rules on our 3 WAN interfaces: ISP on `eth0`, AREDN WAN on `eth1` and HAMWAN on `eth4` that prevents unsolicited inbound traffic from untrusted networks. Likewise, we don't allow any unsolicited traffic arriving from the AREDN LAN port.
 
 	Your level of paranoia dictates whether you want to add more rules and perhaps some logging.
+
+You're DONE! Enjoy your new networks.
 
 ### (Optional) Add firewall rules to your HamWAN router
 
 If you use the default configuration provided by HamWAN support, it will have the minimum configuration needed to NAT and provide Internet access. There are no firewall rules to protect the HamWAN router itself. Here's a set of rules that provide an increased level of security for your HamWAN router.
 
-1. SSH to your HamWAN router. At this point in our project, you should be able to ssh to your HamWAN router (`192.168.88.1` on port `222`) from your home network.
+1. SSH to your HamWAN router at `192.168.88.1` on port `222` from your home network.
 
 	- Create an address list containing all possible HamWAN IP addresses. Enter these commands:
 	
@@ -615,14 +623,14 @@ If you use the default configuration provided by HamWAN support, it will have th
 	
 ### (Optional) Create a Tunnel Server on your AREDN node
 
-You can enable the Tunnel Server feature on your AREDN Node, which allows other hams with AREDN nodes to connect to your node, and thereby providing access to the AREDN meshes you both are connected to. This procedure assumes that you'll be allowing AREDN tunnels to come in via your HamWAN connection, and not your regular ISP.
+You can enable the Tunnel Server feature on your AREDN Node, which allows other hams with AREDN nodes to connect to your node through HamWAN or the Internet, thereby providing each other with access to the AREDN meshes you both are connected to. This procedure assumes that you'll be allowing AREDN tunnels to come in via your HamWAN connection, and not your regular ISP.
 
 1. Verify the DNS name of the outside interface of your HamWAN router.
 
 	- Normally, this name is of the form:
 	
 			wlan1.<callsign-hamwan_site>.hamwan.net
-		where *\<callsign-hamwan_site\>* is the name of your HamWan router. Ask the HamWAN support team if you have questions. Verify the name resolves to an IP address by running this command in Windows (CMD window) or Linux (in a Terminal or SSH session):
+		where *\<callsign-hamwan_site\>* is the name of your HamWan router. Ask the HamWAN support team if you have questions. Verify the name resolves to an IP address by running this command in Windows (CMD window) or Linux/Mac (in a Terminal or SSH session):
 		
 			nslookup wlan1.<callsign-hamwan_site>.hamwan.net
 		This command should return an IP address.  For example:
@@ -635,7 +643,7 @@ You can enable the Tunnel Server feature on your AREDN Node, which allows other 
 			Address 1: 44.25.143.59
 		Make sure it returns an IP address after the `Name:`.
 		
-1. Set up a DNAT (Port Forward) on your HamWAN router to your AREDN node
+1. Set up a DNAT (Desintation NAT, also known as a Port Forward) on your HamWAN router to your AREDN node
 
 	- SSH to your HamWAN router and enter these commands:
 	
@@ -669,9 +677,9 @@ You can enable the Tunnel Server feature on your AREDN Node, which allows other 
 	- Click the __envelope icon__ for the client you just made. This will open your email software and generate a new message with the connection details the client will need to connect to your tunnel.
 	- Fill in the client's email address in the mail message, add a suitable subject, then send the message.
 	
-### (Optional) Connecting Your AREDN Node to a Tunnel Server
+### (Optional) Connecting your AREDN Node to a Tunnel Server
 
-You'll need to contact another AREDN user who is operating a __Tunnel Server__. Ask if you can connect to their tunnel server.  If they say yes, you need to provide the name of your AREDN router to tunnel server administrator, and in turn he'll provide details you'll need to connect to his server. You'll be entering this information in the __Tunnel Client__ section of your AREDN router setup.
+You'll need to contact another AREDN user who is operating a __Tunnel Server__. Ask if you can connect to their tunnel server.  If they say yes, you need to provide the name of your AREDN router to the tunnel server administrator, and in turn he'll provide the details you'll need to connect to his server. You'll be entering this information in the __Tunnel Client__ section of your AREDN router setup.
 
 The Tunnel Server operator will send you an email message with the following information.
 

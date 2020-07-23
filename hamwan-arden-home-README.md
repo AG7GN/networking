@@ -58,7 +58,7 @@ Here's what we're going to build:
 
 ![Home + AREDN + HamWAN Network Integration](img/home-aredn-hamwan-integration.png)
 
-Note the switch inserted between the AREDN Router/Switch and the Ubiquiti Router in the diagram. That's optional. You'll need it if you want to plug any ethernet devices directly into your AREDN LAN.  Otherwise, you can just run a cable directly from the AREDN Router/Switch LAN port to the Ubiquiti Router `eth2` port.  I'll assume you'll be running a cable and not inserting a switch as shown.  You can add a switch at a later date, and no additional configuration is needed on any of the devices in the diagram.
+Note the switch inserted between the AREDN Router/Switch and the Ubiquiti Router in the diagram. That's optional. You'll need it if you want to plug any ethernet devices (a camera, for example) directly into your AREDN LAN.  Otherwise, you can just run a cable directly from the AREDN Router/Switch LAN port to the Ubiquiti Router `eth2` port.  I'll assume you'll be running a cable and not inserting a switch as shown.  You can add a switch at a later date, and no additional configuration is needed on any of the devices in the diagram.
 
 ### Address Assignments
 

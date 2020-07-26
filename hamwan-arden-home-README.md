@@ -383,7 +383,7 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 		set service dns forwarding options server=/local.mesh/<value from Line 1 in your table>
 		commit;save
 
-1. Connect an ethernet cable from ER-X port `eth2` to the AREDN router LAN port.
+1. If you opted to put a switch between the AREDN LAN port and ER-X `eth2`, install that switch now and connect an ethernet cable between the ER-X `eth2` port and your switch, and between the AREDN LAN port and your switch.  Otherwise, just connect an ethernet cable from ER-X port `eth2` to the AREDN router LAN port.  
 
 1. Open another browser window on your PC and see if you can go to __http://localnode.local.mesh__, which is the web interface of your AREDN router.  If so, it's working!  
 
@@ -574,7 +574,11 @@ After running the wizard earlier, the ER-X firewall is configured such that all 
 
 	Your level of paranoia dictates whether you want to add more rules and perhaps some logging.
 
-You're DONE! Enjoy your new networks.
+You're DONE! Enjoy your new networks. 
+
+Budd, WB7FHC, went through this procedure to connect his home, HamWAN and AREDN networks together and he installed his networking equipment in a nice wall mounted cabinet:
+
+![WB7FHC Cabinet](img/WB7FHC_cabinet.jpg)
 
 ### (Optional) Add firewall rules to your HamWAN router
 

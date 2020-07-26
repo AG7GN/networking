@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20200723
+VERSION: 20200726
 
 AUTHOR:  Steve Magnuson AG7GN
 
@@ -19,7 +19,7 @@ This is a long and somewhat complicated procedure.  To increase your chances of 
 - The AREDN image is installed and operational on your AREDN router and you can access it's web interface.  [These instructions](https://arednmesh.readthedocs.io/en/latest/arednGettingStarted/installing_firmware.html) will guide you in getting the image installed.
 - [HamWAN](http://hamwan.org/) hardware connected to HamWAN per the [recommended configuration](http://hamwan.org/Standards/Network%20Engineering/Client%20Node%20Configuration.html).  
 - You are connected to HamWAN and can access your HamWAN router's command line interface (CLI) via SSH.
-- [Ubiquiti ER-X router](https://www.ui.com/edgemax/edgerouter-x/). Other Ubiquiti EdgeRouters will also work, but may require a more complicated configuration because the number of physical ports varies from model to model. Some models and may require an external VLAN-aware ("managed") switch.
+- [Ubiquiti ER-X router](https://www.ui.com/edgemax/edgerouter-x/). Other Ubiquiti EdgeRouters will also work, but may require a more complicated configuration because the number of physical ports varies from model to model. Some models may require an external VLAN-aware ("managed") switch.
 - Garden-variety home router + switch + access point device (likely your current router).
 - Internet service via a cable or DSL modem.
 Note that I'm talking about a MODEM here, not an integrated modem and router provided by your ISP.  We want the Ubiquiti ER-X to do the routing and other related functions. It is possible to integrate an ISP-provided router into this design, but it's more complicated than what I describe here.  Do yourself a favor (and save some money) and return the ISP's router and get a cable modem if you can. Customers who get phone service from the cable company may be stuck with the ISP's router (sorry!).

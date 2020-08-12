@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20200726
+VERSION: 20200812
 
 AUTHOR:  Steve Magnuson AG7GN
 
@@ -11,6 +11,8 @@ We will be introducing a new "brain" into your home network - a routing device t
 ## Disclaimer
 
 This is a long and somewhat complicated procedure.  To increase your chances of success, read through the entire document before you attempt to make changes so you'll know what you're about to undertake.  Following this procedure introduces considerable change to your home network, including renumbering your home network IP addresses.  This will disrupt your current Internet access.  Proceed at your own risk!
+
+---
 
 ## Prerequisites
 
@@ -27,6 +29,8 @@ Note that I'm talking about a MODEM here, not an integrated modem and router pro
 - Cat5 or better ethernet cables of suitable length.
 - PC with a wired ethernet port, and you know how to configure the ethernet port on your PC with a static IP address or an automatically assigned IP (DHCP) address. We'll be doing both in this procedure.
 - If the PC you're going to be using is running Windows, I recommend installing the free SSH application called [Putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html).  If your PC is running Linux or is a Mac, then SSH is available in the Terminal.
+
+---
 
 ## Background
 
@@ -53,6 +57,8 @@ I'm making these assumptions about your current network:
 	- A working AREDN router that is not connected to your home network. See the [AREDN Getting Started Guide](https://arednmesh.readthedocs.io/en/latest/arednGettingStarted/aredn_overview.html) to install the AREDN image on your hardware.
 - You have a new Ubiquiti ER-X that is still at factory default settings. You can [reset it to factory defaults](https://help.ubnt.com/hc/en-us/articles/205202620-EdgeRouter-Reset-to-Factory-Defaults) if necessary.
 
+---
+
 ## Diagram
 
 Here's what we're going to build:
@@ -75,6 +81,8 @@ ER-X `eth3`: `192.168.73.1/24`
 
 ER-X `eth4`: `192.168.88.2/24`
 
+---
+
 ## Definitions
 
 - __CLI__: Command Line Interface.  This is where you enter the commands on the networking devices.  Connecting to your device via [Secure Shell](https://www.ssh.com/ssh) (SSH) is the typical way to access the CLI. The ER-X router provides access to the CLI through it's web interface or via SSH.
@@ -85,7 +93,10 @@ ER-X `eth4`: `192.168.88.2/24`
 - __LAN__: [Local Area Network](https://www.howtogeek.com/353283/what-is-a-local-area-network-lan/). A network to which your devices are directly or wirelessly connected.
 - __M-NAT__: Masquerade [Network Address Translation](https://en.wikipedia.org/wiki/Network_address_translation) translates IP addresses between your private home and AREDN networks to a single public IP address provided to you by your ISP and by the HamWAN administrators.
 - __Policy Routing__: A device with an IP address on your network needs to talk to another device on the Internet.  Somehow, it needs to know how to get that traffic (a series of data packets) to the destination device's IP address.  Routers maintain tables of blocks of IP addresses called [subnets](https://www.subnetting.net/Tutorial.aspx). Routers perform the basic function of [routing](https://study-ccna.com/what-is-ip-routing/) packets. So, as long as your device knows how to contact it's local router, it sends the traffic to the router and the router then knows where to send it. We are going to configure some [policy routing](https://en.wikipedia.org/wiki/Policy-based_routing) on the ER-X router so we can make routing decisions based on criteria other than just the destination IP address.
+- __PPPoE__: [Point-to-Point Protocol over Ethernet](https://en.wikipedia.org/wiki/Point-to-Point_Protocol_over_Ethernet) is commonly used in [Digital Subscriber Line (DSL)](https://en.wikipedia.org/wiki/Digital_subscriber_line) networks. The protocol encapsulates PPP inside Ethernet frames and is primarily used for authentication. 
 - __Private IP addresses__: [Private IP addresses](https://www.lifewire.com/what-is-a-private-ip-address-2625970) are certain ranges of IP addresses that are typically used on home networks and are not allowed and will not work on the Internet (that's why we need NAT). The ranges (blocks) of private IP address are defined in a standards document called [RFC1918](https://tools.ietf.org/html/rfc1918).
+
+---
 
 ## Roadmap
 
@@ -99,7 +110,20 @@ ER-X `eth4`: `192.168.88.2/24`
 1. Connect your HamWAN and AREDN routers to the ER-X.
 1. Finish the ER-X configuration.
 
+---
+
 ## Procedure
+
+> If you have __Internet service that uses PPPoE__, please do the following *BEFORE* starting this procedure! This extra step is ONLY for users with Internet service that uses PPPoE (most DSL services use PPPoE).
+> - Access your current router's configuration (usually a web interface). Every router is different, so it's impossible to provide detailed instructions for this step.
+>
+> - Locate your router's WAN interface [Media Access Control (MAC) address](https://en.wikipedia.org/wiki/MAC_address) in your router's configuration. The address is assigned by the manufacturer and is globally unique. It'll be 12 hexadecimal digits long and may also be called a link adress or ethernet address. It may or may not contain dashes or colons. Make sure you get the WAN interface MAC address and not the LAN or wireless or "bridge" interface MAC address. Examples:
+>  
+>		00:26:b0:f3:ec:d0 
+>		dc-a6-32-04-3a-d6  
+>		00219b48afc8
+> - Write this MAC address down. You *might* need it later. When you write it down, use the form of the address containing colons. Example: If your MAC is `0026b0f3ecd0`, write  `00:26:b0:f3:ec:d0`.
+> - Close your router's web interface.
 
 ### Configure ER-X Router - Part 1
 
@@ -188,8 +212,50 @@ ER-X `eth4`: `192.168.88.2/24`
 		commit;save
 		
 	Ignore any warning messages for now, but make sure you don't see any error messages.  If you see error messages, make sure you entered all the commands above as shown. The configuration will not save if there are errors.
-	
-1. Next, we adjust the ER-X DHCP server settings. We enable the DHCP server only on the HOME LAN ER-X network.
+
+> __IMPORTANT PPPoE DETOUR! For those of you who use PPPoE (most DSL customers)__, we have to take a detour to see how your ISP handles attaching a new router (the ER-X) to your DSL modem. This is *ONLY* for users with ISPs that require PPPoE. The rest of you can continue with regular procedure. 
+>	
+> Some ISPs that use PPPoE will associate your router's ethernet MAC address with your account and you may find that your new router, when connected to your DSL modem, won't allow you to access the Internet. If your "old" router (I'll call the router that currently provides Internet access in your house the "old router" - the new router is the ER-X) is configured to use PPPoE, please follow these steps before continuing with the rest of the procedure. If necessary, we're going to give your ER-X `eth0` port the same MAC address as your old router.
+>
+> - __*THIS STEP WILL INTERRUPT YOUR INTERNET SERVICE!*__ 
+>	- Power OFF your DSL modem.
+>	- Unplug the cable that goes from your DSL modem's ethernet port to your old router's WAN port.
+>	- Connect your DSL modem's ethernet port to `eth0` on your ER-X, 
+>	- Reboot your ER-X.
+>	- Once your ER-X is operational, log back in to the ER-X web interface at `https://192.168.77.1` and open the CLI as you did before.
+>	- Power ON your DSL modem.
+>	- Verify you Internet access by visiting a few sites in a web browser on your PC.
+> - IF YOU HAVE INTERNET ACCESS, great! Your ISP doesn't seem to mind that you've attached a new router to the DSL modem.
+>	- Power off your DSL modem and your old router.
+>	- Reconnect your DSL modem's ethernet port to your old router's WAN port.
+>	- Power on your DSL modem and old router.
+>	- Verify that your home network has Internet access through your old router and DSL modem.
+>	- Your detour ends here! Re-establish access to your ER-X's web interface and open the CLI as you did earlier. Enter configuration mode in the CLI:  
+>		`configure`  
+>	- Continue with the regular procedure.
+> - IF YOU DO NOT HAVE INTERNET ACCESS *or* YOU SEE AN UNEXPECTED WEB PAGE from your service provider regardless of what web site you try to visit (this is called a [captive portal](https://en.wikipedia.org/wiki/Captive_portal)):
+>	- Remember that MAC address you wrote down earlier from your old router? You're going to use that now, so have it handy.
+>	- Power OFF your DSL modem.	 
+>	- In your ER-X CLI, enter these commands:  
+>		`configure`  
+>		`set interfaces ethernet eth0 mac` *the-MAC-address-from-your-old-router*    
+>		`commit;save;exit`  
+>		- Example: (*YOUR* MAC address will be different):  
+>		`configure`  
+>		`set interfaces ethernet eth0 mac 00:26:b0:f3:ec:d0`  
+>		`commit;save;exit`  
+>	- Reboot or power off/on your ER-X and power ON your DSL modem.
+>	- Check Internet access from your PC. If you have Internet access, great. If not, double-check that you've entered everything as described and try again. Also double-check your PPPoE credentials that you entered when you ran the ER-X wizard.
+>	- If it works OK, then:
+>		- Power off your DSL modem and your old router.
+>		- Reconnect your DSL modem's ethernet port to your old router's WAN port.
+>		- Power on your DSL modem and old router.
+>		- Verify that your home network has Internet access through your old router.
+>		- Your detour ends here! Re-establish access to your ER-X's web interface and open the CLI as you did earlier. Enter configuration mode in the CLI:  
+>		`configure`  
+>		- Continue on with the rest of the procedure.
+
+18. Next, we adjust the ER-X DHCP server settings. We enable the DHCP server only on the HOME LAN ER-X network.
 
 		set service dhcp-server hostfile-update enable
 		delete service dhcp-server shared-network-name LAN1
@@ -580,6 +646,8 @@ Budd, WB7FHC, went through this procedure to connect his home, HamWAN and AREDN 
 
 ![WB7FHC Cabinet](img/WB7FHC_cabinet.jpg)
 
+---
+
 ### (Optional) Add firewall rules to your HamWAN router
 
 If you use the default configuration provided by HamWAN support, it will have the minimum configuration needed to NAT and provide Internet access. There are no firewall rules to protect the HamWAN router itself. Here's a set of rules that provide an increased level of security for your HamWAN router.
@@ -624,7 +692,9 @@ If you use the default configuration provided by HamWAN support, it will have th
 	- Add other rules to either the input or forward chain as desired. Note that *rule order is important!* 
 	
 	- Exit your SSH session.
-	
+
+---
+
 ### (Optional) Create a Tunnel Server on your AREDN node
 
 You can enable the Tunnel Server feature on your AREDN Node, which allows other hams with AREDN nodes to connect to your node through HamWAN or the Internet, thereby providing each other with access to the AREDN meshes you both are connected to. This procedure assumes that you'll be allowing AREDN tunnels to come in via your HamWAN connection, and not your regular ISP.
@@ -680,7 +750,9 @@ You can enable the Tunnel Server feature on your AREDN Node, which allows other 
 1. Notify the Operator of the Tunnel Client
 	- Click the __envelope icon__ for the client you just made. This will open your email software and generate a new message with the connection details the client will need to connect to your tunnel.
 	- Fill in the client's email address in the mail message, add a suitable subject, then send the message.
-	
+
+---
+
 ### (Optional) Connecting your AREDN Node to a Tunnel Server
 
 You'll need to contact another AREDN user who is operating a __Tunnel Server__. Ask if you can connect to their tunnel server.  If they say yes, you need to provide the name of your AREDN router to the tunnel server administrator, and in turn he'll provide the details you'll need to connect to his server. You'll be entering this information in the __Tunnel Client__ section of your AREDN router setup.
@@ -719,6 +791,8 @@ Your connection details:
 
 - The WECG operates an AREDN Tunnel Server. Send your AREDN router name to `w7ecg.wecg@gmail.com` and request to connect to their server.
 
+---
+
 ### (Optional) Define some Local Hostnames
 
 How are you going to remember all of these IP addresses? Use names instead by adding records to your ER-X DNS server.
@@ -751,7 +825,9 @@ How are you going to remember all of these IP addresses? Use names instead by ad
 1. Finish
 
 		commit;save;exit
-		
+
+---
+
 ### (Optional) DHCP Reservations
 
 - To create a DHCP reservation:

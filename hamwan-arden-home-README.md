@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20200812
+VERSION: 20200816
 
 AUTHOR:  Steve Magnuson AG7GN
 
@@ -611,7 +611,7 @@ After running the wizard earlier, the ER-X firewall is configured such that all 
 		set firewall name HAMWAN_IN rule 10 state new disable
 		set firewall name HAMWAN_IN rule 10 state related enable
 		set firewall name HAMWAN_IN rule 20 action accept
-		set firewall name HAMWAN_IN rule 20 description ‘Allow AREDN Services'
+		set firewall name HAMWAN_IN rule 20 description 'Allow AREDN Services'
 		set firewall name HAMWAN_IN rule 20 destination address 192.168.77.2
 		set firewall name HAMWAN_IN rule 20 destination group port-group AREDN_SERVICES
 		set firewall name HAMWAN_IN rule 20 log disable

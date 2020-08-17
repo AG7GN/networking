@@ -13,3 +13,5 @@ AUTHOR:  Steve Magnuson, AG7GN
 [Netfilter Flowchart and Order of Operation](https://github.com/AG7GN/networking/blob/master/iptables-README.md)
 
 [Notes on Setting up a Private Jitsi Server](https://github.com/AG7GN/networking/blob/master/private-jitsi-server-README.md)
+
+[Notes on Running Apache on the Nexus DR-X](https://github.com/AG7GN/networking/blob/master/Apache-on-Nexus-notes-README.md)

@@ -1,4 +1,4 @@
-# Notes on Installing and Operating a tftp server on the Nexus
+# Notes on Installing and Operating a TFTP server on the Nexus
 
 VERSION 20200821
 
@@ -6,10 +6,10 @@ AUTHOR Steve Magnuson, AG7GN
 
 1. Install the latest __hampi-iptables__ rules.
 
-	- Click __Raspberry > Hamradio > Update Pi and Ham Apps__.
+	- Click __Raspberry > Hamradio > Update Pi and Ham Software__.
 	- Select __hampi-iptables__, click __OK__.
 
-1. Install the tftp server. Open a Terminal, then run:
+1. Install the TFTP server. Open a Terminal, then run:
 	
 		sudo apt update
 		sudo apt -y install tftpd-hpa atftp
@@ -32,6 +32,13 @@ AUTHOR Steve Magnuson, AG7GN
 	
 	Save the file and close the editor.
 
+1.	Restart the TFTP server. In the Terminal, run:
+
+		sudo systemctl restart tftpd-hpa.service
+		
 1.	Copy files you want to serve to tftp clients into `/srv/tftp`
 
+	- The files you serve must be readable by all.
 	- Files that are "put" to the tftp server will also be in `/srv/tftp`.
+	
+1. The TFTP server will automatically start when the Pi is rebooted.

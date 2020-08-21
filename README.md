@@ -15,3 +15,6 @@ AUTHOR:  Steve Magnuson, AG7GN
 [Notes on Setting up a Private Jitsi Server](https://github.com/AG7GN/networking/blob/master/private-jitsi-server-README.md)
 
 [Notes on Running Apache on the Nexus DR-X](https://github.com/AG7GN/networking/blob/master/Apache-on-Nexus-notes-README.md)
+
+
+[Notes on Installing an Operating a TFTP server on the Nexus](https://github.com/AG7GN/networking/blob/master/tftpd-on-nexus-README.md)

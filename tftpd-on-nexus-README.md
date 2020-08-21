@@ -43,7 +43,7 @@ AUTHOR Steve Magnuson, AG7GN
 	
 1. The TFTP server will automatically start when the Pi is rebooted.
 
-1. __If the TFTP *CLIENT* is Linux__ and running iptables, run these commands on the client to enable TFTP connection tracking (or disable the firewall - not recommended)
+1. __If the TFTP *CLIENT* is Linux__ and running `iptables`, run these commands on the client to enable TFTP connection tracking (or disable the firewall - not recommended)
 
 			sudo modprobe nf_conntrack_tftp
 			sudo iptables -t raw -I OUTPUT -j CT -p udp -m udp --dport 69 --helper tftp

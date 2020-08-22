@@ -59,13 +59,11 @@ AUTHOR Steve Magnuson, AG7GN
 	
 1. `tftp` script to add firewall rules and start `atftp`
 
-	- Run these commands in the Terminal:
+	- Run these commands in the Terminal to create the script (only have to do this one time):
 	
 			cat >tftp <<EOF
 			#!/bin/bash
-
 			# Adds tftp contracking if needed for the aftp client
-
 			lsmod | grep -q  nf_conntrack_tftp || sudo modprobe nf_conntrack_tftp 
 			if ! sudo iptables -t raw -L OUTPUT | grep -q "^CT"
 			then
@@ -73,10 +71,10 @@ AUTHOR Steve Magnuson, AG7GN
 			fi
 			$(command -v atftp)
 			EOF
-			chomd +x tftp
+			chmod +x tftp
 			sudo mv tftp /usr/local/bin/
 			
-	- To run, just enter `tftp` in the Terminal.
+	- To run the script, just enter `tftp` in the Terminal.
 
 
 

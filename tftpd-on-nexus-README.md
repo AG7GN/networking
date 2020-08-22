@@ -57,7 +57,7 @@ AUTHOR Steve Magnuson, AG7GN
 
 	- Needed because the TFTP server's SOURCE port changes for return packets (it's not 69).
 	
-1. `tftp` script to add firewall rules and start `atftp`
+1. OPTIONAL: `tftp` script to add firewall rules and start `atftp`
 
 	- Run these commands in the Terminal to create the script (only have to do this one time):
 	

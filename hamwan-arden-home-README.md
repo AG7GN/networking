@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20200816
+VERSION: 20210614
 
 AUTHOR:  Steve Magnuson AG7GN
 
@@ -24,11 +24,11 @@ This is a long and somewhat complicated procedure.  To increase your chances of 
 - [Ubiquiti ER-X router](https://www.ui.com/edgemax/edgerouter-x/). Other Ubiquiti EdgeRouters will also work, but may require a more complicated configuration because the number of physical ports varies from model to model. Some models may require an external VLAN-aware ("managed") switch.
 - Garden-variety home router + switch + access point device (likely your current router).
 - Internet service via a cable or DSL modem.
-Note that I'm talking about a MODEM here, not an integrated modem and router provided by your ISP.  We want the Ubiquiti ER-X to do the routing and other related functions. It is possible to integrate an ISP-provided router into this design, but it's more complicated than what I describe here.  Do yourself a favor (and save some money) and return the ISP's router and get a cable modem if you can. Customers who get phone service from the cable company may be stuck with the ISP's router (sorry!).
+Note that I'm talking about a MODEM here, not an integrated modem and router provided by your ISP or perhaps you own.  We want the Ubiquiti ER-X to do the routing and other related functions. It is possible to integrate an ISP-provided router into this design, but it's more complicated than what I describe here.  Do yourself a favor (and save some money) and return the ISP's router and get a plain cable modem if you can. Customers who get phone service from the cable company may be stuck with the ISP's router (sorry!).
 - Familiarity with configuring your home router, HamWAN and AREDN equipment.
 - Cat5 or better ethernet cables of suitable length.
 - PC with a wired ethernet port, and you know how to configure the ethernet port on your PC with a static IP address or an automatically assigned IP (DHCP) address. We'll be doing both in this procedure.
-- If the PC you're going to be using is running Windows, I recommend installing the free SSH application called [Putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html).  If your PC is running Linux or is a Mac, then SSH is available in the Terminal.
+- If the PC you're going to be using is running Windows, I recommend installing the free SSH client application called [Putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html). If your PC is running Linux or is a Mac, then SSH is available in the Terminal.
 
 ---
 
@@ -55,7 +55,7 @@ I'm making these assumptions about your current network:
 - You have one or both of these:
 	- A working HamWAN router that is connected to the HamWAN network per the [recommended configuration](http://hamwan.org/Standards/Network%20Engineering/Client%20Node%20Configuration.html), but it is not connected to your home network.
 	- A working AREDN router that is not connected to your home network. See the [AREDN Getting Started Guide](https://arednmesh.readthedocs.io/en/latest/arednGettingStarted/aredn_overview.html) to install the AREDN image on your hardware.
-- You have a new Ubiquiti ER-X that is still at factory default settings. You can [reset it to factory defaults](https://help.ubnt.com/hc/en-us/articles/205202620-EdgeRouter-Reset-to-Factory-Defaults) if necessary.
+- You have a new Ubiquiti ER-X that is still at factory default settings. [Reset it to factory defaults](https://help.ubnt.com/hc/en-us/articles/205202620-EdgeRouter-Reset-to-Factory-Defaults) if necessary.
 
 ---
 
@@ -125,7 +125,7 @@ ER-X `eth4`: `192.168.88.2/24`
 > - Write this MAC address down. You *might* need it later. When you write it down, use the form of the address containing colons. Example: If your MAC is `0026b0f3ecd0`, write  `00:26:b0:f3:ec:d0`.
 > - Close your router's web interface.
 
-### Configure ER-X Router - Part 1
+### A. Configure ER-X Router - Part 1
 
 1. It's likely that when your ER-X router arrives, it'll have an older version of firmware. Using a PC with Internet access, visit the EdgeRouter [downloads](https://www.ui.com/download/edgemax) page. You'll see a lot of files on that page.  We're interested in the most recent version for the `EdgeRouter ER-X/ER-X-SFP/EP-R6/ER-10X` models.  As of this writing, the latest version is `v2.0.8-hotfix.1`. You may see more than one firmware file for the ER-X listed.  Look for the most recent version. Click the corresponding download link and save it to your PC. Use this same PC to configure the ER-X in the following steps, or transfer the downloaded firmware file to the PC you'll be using in the following steps.
 
@@ -295,7 +295,7 @@ ER-X `eth4`: `192.168.88.2/24`
 
 1.	Make sure your PC's ethernet port is set to automatically obtain an IP address.  It should already be set this way.
 		
-### Reconfigure your Current WiFi/Router/Switch (WRS)
+### B. Reconfigure your Current WiFi/Router/Switch (WRS)
 
 *These steps will disable Internet at your QTH!*  
 
@@ -321,7 +321,7 @@ Every WRS manufacturer has a different procedure for what we're about to do, so 
 1. Reboot your WRS.
 1. Disconnect your PC from the WRS.
 
-### Test Home LAN Internet Connectivity
+### C. Test Home LAN Internet Connectivity
 
 Now we'll test your home LAN connection through the ER-X. 
 
@@ -333,7 +333,7 @@ Now we'll test your home LAN connection through the ER-X.
 	
 	- *Don't move on to the next steps until you've verified Internet connectivity!* 		  Troubleshoot as needed to restore Internet service.
 
-### Configure the AREDN Router
+### D. Configure the AREDN Router
 
 Your PC should still be in "Configure IP address automatically" mode at this stage.
 
@@ -399,7 +399,7 @@ Your PC should still be in "Configure IP address automatically" mode at this sta
 
 	- *Don't move on to the next steps until you've verified Internet connectivity!* 		  Troubleshoot as needed to restore Internet service.
 	
-### Configure the HamWAN router
+### E. Configure the HamWAN router
 
 Only 2 additional commands are needed in the HamWAN router. These commands tell the HamWAN router about the IP address subnets that we're using on our home network and our AREDN router's WAN and that those subnets are reachable via the ER-X's `eth4` port, which has IP address `192.168.88.2`.
 
@@ -421,7 +421,7 @@ Only 2 additional commands are needed in the HamWAN router. These commands tell 
 1. Unplug your PC from your HamWAN router's ethernet port and leave your PC disconnected for now.
 1. Connect an ethernet cable between the ER-X `eth4` port and the ethernet port of your HamWAN router.
 
-### Configure ER-X Router - Part 2
+### F. Configure ER-X Router - Part 2
 
 We'll add to the DNS server configuration to enable name resolution of AREDN devices and we'll enable masquerade NAT on the AREDN LAN interface. Enabling masquerade NAT will give the AREDN router the illusion that the packets are coming from a device on it's own LAN when in reality they are coming from a device on your home network. The NAT feature plus AREDN name resolution will allow any of your home LAN devices to access any AREDN devices by name or IP address.
 
@@ -457,7 +457,7 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 
 Standard IP routing uses the destination IP address as the criteria to determine where to send IP packets. The router maintains a table of destination IP networks for this purpose.  This is called the main routing table. We're going to implement Policy Routing so we can use other criteria to tell the router where to send certain packets.  We'll create a new routing table that our policies can use to forward packets.  Policies can selectively use either the main table or our new table depending on the criteria we define.
 
-1. Back in the ER-X CLI, set up a new routing table (we'll call it table `88`) just for HamWAN. `0.0.0.0/0` means "all networks". This is called a [default route](https://en.wikipedia.org/wiki/Default_route).  If no other route in the routing table matches the destination IP address, then the router uses the default route to forward the packet.  Routing table 88's default route will point to the HamWAN router.
+8. Back in the ER-X CLI, set up a new routing table (we'll call it table `88`) just for HamWAN. `0.0.0.0/0` means "all networks". This is called a [default route](https://en.wikipedia.org/wiki/Default_route).  If no other route in the routing table matches the destination IP address, then the router uses the default route to forward the packet.  Routing table 88's default route will point to the HamWAN router.
 
 		set protocols static table 88 route 0.0.0.0/0 next-hop 192.168.88.1
 		
@@ -532,7 +532,7 @@ Standard IP routing uses the destination IP address as the criteria to determine
 
 After running the wizard earlier, the ER-X firewall is configured such that all traffic inbound on the Internet facing interface `eth0` is dropped unless it is in reply to traffic sent by a device on our AREDN or Home LANs. Traffic arriving on `eth0` that is in reply to traffic we originated from our inside devices is called "established and related".  The firewall keeps track of all of the conversations our devices are having and it knows which IP address initiated each conversation.  If our inside device initiates a conversation, the firewall assumes that any replies coming in from the Internet related to that conversation are OK and are allowed to pass. When you are on a PC on your home LAN and open a web browser and connect to your bank's website, for example, your PC *initiated* that conversation with your bank's website.  From then on, any packets from your bank's website to your PC that are part of that conversation ('established and related') are allowed from the Internet.  Note that the firewall rules below have numbers.  Those numbers are used to tell the firewall the order in which to evaluate the rules.  Firewall rule order is important.
 
-1.	Make a network group of the private IP address defined in [RFC1918](https://tools.ietf.org/html/rfc1918).  All of our inside networks, as well as AREDN networks, are in these address ranges.
+17.	Make a network group of the private IP address defined in [RFC1918](https://tools.ietf.org/html/rfc1918).  All of our inside networks, as well as AREDN networks, are in these address ranges.
 
 		set firewall group network-group RFC1918_Nets description 'Private IP Addresses'
 		set firewall group network-group RFC1918_Nets network 10.0.0.0/8
@@ -560,7 +560,7 @@ After running the wizard earlier, the ER-X firewall is configured such that all 
 
 		set interfaces ethernet eth1 firewall in name AREDN_WAN_IN
 		
-1. The previous steps took care of traffic arriving on `eth1` and destined for some other network.  Now we need to add some protection for the router itself.  All traffic destined for the router itself from the AREDN WAN is dropped unless it is in reply to traffic originating from the ER-X.
+1. The previous steps took care of traffic arriving on `eth1` and destined for some other network.  Now we need to add some protection for the router itself.  All traffic destined for the router itself from the AREDN WAN is dropped unless it is in reply to traffic originating from the ER-X. Also allow the AREDN router to ping the ER-X's AREDN WAN interface.
 
 		set firewall name AREDN_WAN_LOCAL default-action drop
 		set firewall name AREDN_WAN_LOCAL description 'Established and Related'
@@ -571,6 +571,11 @@ After running the wizard earlier, the ER-X firewall is configured such that all 
 		set firewall name AREDN_WAN_LOCAL rule 10 state invalid disable
 		set firewall name AREDN_WAN_LOCAL rule 10 state new disable
 		set firewall name AREDN_WAN_LOCAL rule 10 state related enable
+		set firewall name AREDN_WAN_LOCAL rule 11 action accept
+		set firewall name AREDN_WAN_LOCAL rule 11 description 'ICMP Echo'
+		set firewall name AREDN_WAN_LOCAL rule 11 icmp type-name echo-request
+		set firewall name AREDN_WAN_LOCAL rule 11 log disable
+		set firewall name AREDN_WAN_LOCAL rule 11 protocol icmp
 		set interfaces ethernet eth1 firewall local name AREDN_WAN_LOCAL
 		
 1. Let's restrict traffic inbound through the ER-X on `eth2`, the AREDN LAN port, to replies to traffic we initiated from our Home LAN:
@@ -586,7 +591,7 @@ After running the wizard earlier, the ER-X firewall is configured such that all 
 		set firewall name AREDN_LAN_IN rule 10 state related enable
 		set interfaces ethernet eth2 firewall in name AREDN_LAN_IN
 		
-1. Do the same for traffic destined for the router itself from the AREDN LAN: Restrict inbound traffic to only conversations that were initiated by the router.
+1. Do the same for traffic destined for the router itself from the AREDN LAN: Restrict inbound traffic to only conversations that were initiated by the router plus allow AREDN LAN devices to ping the ER-X AREDN LAN interface (eth2).
 
 		set firewall name AREDN_LAN_LOCAL default-action drop
 		set firewall name AREDN_LAN_LOCAL rule 10 action accept
@@ -597,6 +602,11 @@ After running the wizard earlier, the ER-X firewall is configured such that all 
 		set firewall name AREDN_LAN_LOCAL rule 10 state invalid disable
 		set firewall name AREDN_LAN_LOCAL rule 10 state new disable
 		set firewall name AREDN_LAN_LOCAL rule 10 state related enable
+		set firewall name AREDN_LAN_LOCAL rule 11 action accept
+		set firewall name AREDN_LAN_LOCAL rule 11 description 'ICMP Echo'
+		set firewall name AREDN_LAN_LOCAL rule 11 icmp type-name echo-request
+		set firewall name AREDN_LAN_LOCAL rule 11 log disable
+		set firewall name AREDN_LAN_LOCAL rule 11 protocol icmp
 		set interfaces ethernet eth2 firewall local name AREDN_LAN_LOCAL
 
 1. Finally, let's apply the same rules to the HamWAN interface, and add some rules that will allow access to any AREDN services we want to make available on HamWAN.
@@ -621,6 +631,8 @@ After running the wizard earlier, the ER-X firewall is configured such that all 
 		
 1. Add rules to protect the firewall from HamWAN.
 
+	Allow already established traffic to return via HamWAN (rule 10) and allow the HamWAN router to ping the ER-X (rule 11).
+
 		set firewall name HAMWAN_LOCAL default-action drop
 		set firewall name HAMWAN_LOCAL rule 10 action accept
 		set firewall name HAMWAN_LOCAL rule 10 description 'Established and Related'
@@ -630,6 +642,11 @@ After running the wizard earlier, the ER-X firewall is configured such that all 
 		set firewall name HAMWAN_LOCAL rule 10 state invalid disable
 		set firewall name HAMWAN_LOCAL rule 10 state new disable
 		set firewall name HAMWAN_LOCAL rule 10 state related enable
+		set firewall name HAMWAN_LOCAL rule 11 action accept
+		set firewall name HAMWAN_LOCAL rule 11 description 'ICMP Echo'
+		set firewall name HAMWAN_LOCAL rule 11 icmp type-name echo-request
+		set firewall name HAMWAN_LOCAL rule 11 log disable
+		set firewall name HAMWAN_LOCAL rule 11 protocol icmp
 		set interfaces ethernet eth4 firewall local name HAMWAN_LOCAL
 		
 1. Save your changes and exit configure mode
@@ -639,6 +656,16 @@ After running the wizard earlier, the ER-X firewall is configured such that all 
 1. Why no firewall rules on our Home LAN interface?  You can add some if you like.  Generally, we trust the Home LAN.  By default, in the absence of any rules we create, all traffic is allowed. We have rules on our 3 WAN interfaces: ISP on `eth0`, AREDN WAN on `eth1` and HAMWAN on `eth4` that prevents unsolicited inbound traffic from untrusted networks. Likewise, we don't allow any unsolicited traffic arriving from the AREDN LAN port.
 
 	Your level of paranoia dictates whether you want to add more rules and perhaps some logging.
+	
+### G. Backup/Restore your Configuration
+
+There are multiple ways to do this. The easiest way is using the ER-X's web interface.
+
+1. Open the ER-X web interface and log in.
+1. Locate and click the __System__ button at the bottom of the web page.
+1. Scroll down until you see __Configuration Management & Device Maintenance__, then click the __Download__ button under __Backup Up Config__. Follow the prompts to save the backup file to your PC.
+
+Restoring the configuration is easy: Just click __Upload a file__ under __Restore Config__ in that same __Configuration Management & Device Maintenance__ section.
 
 You're DONE! Enjoy your new networks. 
 
@@ -679,7 +706,7 @@ If you use the default configuration provided by HamWAN support, it will have th
 			add action=drop chain=input comment="drop input invalid" connection-state=invalid
 			add action=accept chain=input comment="accept input ICMP" protocol=icmp
 			add action=accept chain=input comment="accept input from HamWAN" connection-state=new in-interface=wlan1 src-address-list=HamWAN
-			add action=drop chain=input comment="drop input not coming from LAN" in-interface=!bridgeLocal
+			add action=drop chain=input comment="drop input not coming from LAN" in-interface=!ether1
 			
 	- Create a forward chain that filters traffic *through* the HamWAN router. This includes a rule that allows for a future AREDN Tunnel Server should you want to set one up:
 	
@@ -723,7 +750,7 @@ You can enable the Tunnel Server feature on your AREDN Node, which allows other 
 	
 			/ip firewall nat	
 			add action=dst-nat chain=dstnat comment="AREDN Tunnel Server" dst-port=5525 in-interface=wlan1 protocol=tcp to-addresses=192.168.77.2 to-ports=5525
-			.. .. .. quit
+			/quit
 			
 	- Configure additional firewall rules on your HamWAN router. See previous section "(Optional) Add Firewall Rules to your HamWAN Router" for instructions.
 	- Exit your HamWAN Router
@@ -832,7 +859,7 @@ How are you going to remember all of these IP addresses? Use names instead by ad
 
 - To create a DHCP reservation:
 
-	1. Open the web interface of your ER-X.
+	1. Open and log in to the web interface of your ER-X.
 
 	1. Click the __Services__ tab.
 

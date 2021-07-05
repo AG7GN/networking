@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20210614
+VERSION: 20210705
 
 AUTHOR:  Steve Magnuson AG7GN
 
@@ -675,7 +675,11 @@ Budd, WB7FHC, went through this procedure to connect his home, HamWAN and AREDN 
 
 ---
 
-### (Optional) Add firewall rules to your HamWAN router
+## H. OPTIONAL Enhancements and Features
+
+The remainder of this document describes additional features you can add to your setup. They are purely OPTIONAL.
+
+### Add firewall rules to your HamWAN router
 
 If you use the default configuration provided by HamWAN support, it will have the minimum configuration needed to NAT and provide Internet access. There are no firewall rules to protect the HamWAN router itself. Here's a set of rules that provide an increased level of security for your HamWAN router.
 
@@ -722,7 +726,7 @@ If you use the default configuration provided by HamWAN support, it will have th
 
 ---
 
-### (Optional) Create a Tunnel Server on your AREDN node
+### Create a Tunnel Server on your AREDN node
 
 You can enable the Tunnel Server feature on your AREDN Node, which allows other hams with AREDN nodes to connect to your node through HamWAN or the Internet, thereby providing each other with access to the AREDN meshes you both are connected to. This procedure assumes that you'll be allowing AREDN tunnels to come in via your HamWAN connection, and not your regular ISP.
 
@@ -780,7 +784,7 @@ You can enable the Tunnel Server feature on your AREDN Node, which allows other 
 
 ---
 
-### (Optional) Connecting your AREDN Node to a Tunnel Server
+### Connecting your AREDN Node to a Tunnel Server
 
 You'll need to contact another AREDN user who is operating a __Tunnel Server__. Ask if you can connect to their tunnel server.  If they say yes, you need to provide the name of your AREDN router to the tunnel server administrator, and in turn he'll provide the details you'll need to connect to his server. You'll be entering this information in the __Tunnel Client__ section of your AREDN router setup.
 
@@ -820,7 +824,7 @@ Your connection details:
 
 ---
 
-### (Optional) Define some Local Hostnames
+### Define Local Hostnames
 
 How are you going to remember all of these IP addresses? Use names instead by adding records to your ER-X DNS server.
 
@@ -855,7 +859,7 @@ How are you going to remember all of these IP addresses? Use names instead by ad
 
 ---
 
-### (Optional) DHCP Reservations
+### Home LAN DHCP Reservations
 
 - To create a DHCP reservation:
 
@@ -877,5 +881,75 @@ How are you going to remember all of these IP addresses? Use names instead by ad
 
 	1. Locate the desired mapping and click the corresponding __Actions__ button, and select __Delete__ from the dropdown list.
 
+---
+### Allowing Selective Access from AREDN to Your Home LAN
 
+Some hams might find it convenient to install a device (like an IP camera) on their home LAN yet still have it accessible from the AREDN mesh. We'll use an example to describe how to accomplish this. 
 
+In our example, let's say we have an IP camera on our Home LAN with IP address `192.168.73.100` and it listens on TCP ports `80` and `554` for access to the camera's web interface and video stream respectively. Our goal is to make that device and those ports available to the AREDN network.
+
+*WARNING! - DON'T just copy/paste the commands below! You must use the IP address and port(s) for your device, which are likely to be different than the ones I made up for this example!*
+
+1. Get your device working and accessible on your Home LAN.
+1. Create a [DHCP reservation on your ER-X](#home-lan-dhcp-reservations) for that device or assign it a static IP address to ensure it has a consistent IP address. Follow that link to another section of this document for instructions on how to set up a DHCP reservation on the ER-X. 
+1. Configure a [Destination NAT](https://help.ui.com/hc/en-us/articles/205231700-EdgeRouter-Destination-NAT) on your ER-X.
+
+	- Log in to your ER-X's CLI (via the web interface or using an SSH client, like Putty for example)
+	- Enter configuration mode
+		
+			configure
+	- Create a port group for the ports we need to allow access to from AREDN. Since our example is for an IP camera, we'll name the port group `CAMERA_PORTS` and add our 2 ports to it.
+	
+			set firewall group port-group CAMERA_PORTS description 'Home LAN IP Camera Ports'
+			set firewall group port-group CAMERA_PORTS port 80
+			set firewall group port-group CAMERA_PORTS port 554
+	- Create a DNAT rule. This rule translates traffic coming in from AREDN, destined for the ER-X's AREDN LAN IP address assigned to port `eth2` to `192.168.73.100`, the IP address assigned to the IP camera on the Home LAN. It also excludes traffic matching this rule from the existing `masquerade` NAT configured on `eth2`.
+	
+			set firewall nat rule 201 description 'DNAT for AREDN access to Home LAN camera'
+			set firewall nat rule 201 destination group address-group ADDRv4_eth2 
+			set firewall nat rule 201 exclude
+			set firewall nat rule 201 inbound-interface eth2
+			set firewall nat rule 201 inside-address 192.168.73.100
+			set firewall nat rule 201 protocol tcp
+			set firewall nat rule 201 type destination
+		
+1. Adjust the ER-X firewall rules to allow traffic originating from AREDN to the camera on your Home LAN.
+
+	- Create a firewall rule allowing traffic with destination TCP ports matching the camera's listening TCP ports (`80` and `554`) to the camera's IP address on the Home LAN 
+	
+			set firewall name AREDN_LAN_IN rule 15 action accept
+			set firewall name AREDN_LAN_IN rule 15 description 'Allow AREDN access to Home LAN IP Camera'
+			set firewall name AREDN_LAN_IN rule 15 log disable
+			set firewall name AREDN_LAN_IN rule 15 protocol tcp
+			set firewall name AREDN_LAN_IN rule 15 state new enable
+			set firewall name AREDN_LAN_IN rule 15 destination address 192.168.73.100
+			set firewall name AREDN_LAN_IN rule 15 destination group port-group CAMERA_PORTS
+			
+	- Save the configuration and exit configuration mode
+	
+			commit;save;exit
+			
+	- Close your CLI session:
+	
+			exit
+			
+1. Set up a service for the camera on your AREDN Router. You'll need the IP address from Line 2 from the table you made in step 4 of the __D. Configure the AREDN Router__ section of this document.
+
+	- Log in to your local AREDN router's web interface. Click __Setup__ and provide your username and password.
+	- Click __Port Forwarding, DHCP, and Services__.
+	- Examine the list of IP addresses in the __DHCP Address Reservations__ section. 
+	
+		- If you *do not* see the IP address from Line 2 of the table you made in step 4 of the __D. Configure the AREDN Router__ section of this document, then click the down arrow icon in the __- IP Address -__ field and select it from the list, then click __Add__ to add it to the reservations list. Add a suitable hostname for this new entry. For example: __ag7gn-erx__. Make a note of the Hostname.
+		- If you *do* see the IP address from Line 2 of the table you made in step 4 of the __D. Configure the AREDN Router__ section of this document in the __DHCP Address Reservations__ list, make note of the Hostname for that entry (change it if you want to).
+		
+	- In the __Advertised Services__ section, add a Name for your Camera. This name will be visible on all other AREDN nodes in the mesh, so make it meaningful and unique. Something like __ag7gn-camera__.
+	- Check the __Link__ box (if your device's service can be accessed via a URL) and add __http__ or __rtsp__ or ... (whatever is appropriate for your device), then select the name you just added/found from the previous step (__ag7gn-erx__ in this example) from the dropdown.
+	- In the field after the ':', add the port for your device.
+	- In the field after the '/', add whatever remaining part of the URL is needed for others to access your device. This will vary depending on the device. In some cases this field contains nothing.
+	- Click __Add__.
+	- Repeat the previous steps in this section for each unique service you want to make available from this device. For this example, we need 2 entries, one for port `80` and one for port `554`.
+	- Click __Save Changes__.
+	
+Your device should now be available to anyone on the AREDN mesh.
+	
+	

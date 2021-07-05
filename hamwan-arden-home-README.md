@@ -947,7 +947,7 @@ In our example, let's say we have an IP camera on our Home LAN with IP address `
 	- In the field after the ':', add the port for your device.
 	- In the field after the '/', add whatever remaining part of the URL is needed for others to access your device. This will vary depending on the device. In some cases this field contains nothing.
 	- Click __Add__.
-	- Repeat the previous steps in this section for each unique service you want to make available from this device. For this example, we need 2 entries, one for port `80` and one for port `554`.
+	- Repeat the previous 5 steps for each unique service you want to make available from this device. For this example, we need 2 entries, one for port `80` and one for port `554`.
 	- Click __Save Changes__.
 	
 Your device should now be available to anyone on the AREDN mesh.

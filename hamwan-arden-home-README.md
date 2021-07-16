@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20210705
+VERSION: 20210716
 
 AUTHOR:  Steve Magnuson AG7GN
 
@@ -905,13 +905,12 @@ In our example, let's say we have an IP camera on our Home LAN with IP address `
 			set firewall group port-group CAMERA_PORTS port 554
 	- Create a DNAT rule. This rule translates traffic coming in from AREDN, destined for the ER-X's AREDN LAN IP address assigned to port `eth2` to `192.168.73.100`, the IP address assigned to the IP camera on the Home LAN. It also excludes traffic matching this rule from the existing `masquerade` NAT configured on `eth2`.
 	
-			set firewall nat rule 201 description 'DNAT for AREDN access to Home LAN camera'
-			set firewall nat rule 201 destination group address-group ADDRv4_eth2 
-			set firewall nat rule 201 exclude
-			set firewall nat rule 201 inbound-interface eth2
-			set firewall nat rule 201 inside-address 192.168.73.100
-			set firewall nat rule 201 protocol tcp
-			set firewall nat rule 201 type destination
+			set service nat rule 201 description 'DNAT for AREDN access to Home LAN camera'
+			set service nat rule 201 destination group address-group ADDRv4_eth2 
+			set service nat rule 201 inbound-interface eth2
+			set service nat rule 201 inside-address address 192.168.73.100
+			set service nat rule 201 protocol tcp
+			set service nat rule 201 type destination
 		
 1. Adjust the ER-X firewall rules to allow traffic originating from AREDN to the camera on your Home LAN.
 

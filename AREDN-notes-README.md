@@ -6,11 +6,15 @@ AUTHOR Steve Magnuson, AG7GN
 
 ## Setting up Putty for ssh Access to your `localnode`
 
-This is for Windows users. Linux/Mac users can just use `ssh` in the Console. However, there is a version of putty for Linux. 
+This is for Windows users. However, there is a version of putty for Linux. 
+
+- Linux/Mac users can run this command in a Terminal to access `localnode` via ssh:
+
+		ssh -p 2222 root@localnode.local.mesh
 
 ### Install Putty
 
-- [Download the MSI](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) (Windows Installer). Linux users: Use the package manager for your distribution to install it.
+- [Download the MSI](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) (Windows Installer). Linux users: Use the package manager for your distribution to install Putty.
 -  Double-click the downloaded file to run the installer
 
 ### Run Putty

@@ -1,4 +1,4 @@
-# Notes on Customizing AREDN
+# AREDN Notes
 
 VERSION 20210718
 

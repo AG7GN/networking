@@ -6,7 +6,7 @@ AUTHOR Steve Magnuson, AG7GN
 
 ## Setting up Putty for ssh Access to your `localnode`
 
-This is for Windows users. However, there is a version of putty for Linux. 
+This is for Windows users because Windows does not have a built-in ssh client. However, there is a version of putty for Linux. 
 
 - Linux/Mac users can run this command in a Terminal to access `localnode` via ssh:
 

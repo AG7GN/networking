@@ -98,7 +98,7 @@ So, to force all other nodes on the mesh to flush the list of services that they
 
 Of course, as an alternative, you could contact the owners of all the other nodes and have them reboot their nodes to flush their cache, but that would be a lot of work!
 
-## ADVANCED: Adding hostnames to the DNS configuration on an AREDN node
+## HACK: Adding hostnames to the DNS configuration on an AREDN node
 
 Note that names you add in this way will only be resolvable by your local node, not by other nodes on the mesh.  I have a submitted an [enhancement request](https://github.com/aredn/aredn_ar71xx/issues/516) to the AREDN team to add this feature so it'll work on the entire mesh.
 

@@ -1,6 +1,6 @@
 # Integrating AREDN and HamWAN with your Home Network
 
-VERSION: 20210716
+VERSION: 20221203
 
 AUTHOR:  Steve Magnuson AG7GN
 
@@ -444,11 +444,15 @@ Remember that table you made in the [Configure AREDN Router - Part 1](#configure
 
 		set protocols static route 10.0.0.0/8 next-hop <value from Line 1 in your table> description AREDN
 
-1. Finally, we'll tell the ER-X DNS server to send requests for name resolution for names ending in `.local.mesh` to the AREDN router's LAN interface IP address (from your table) where your local AREDN node's DNS server is listening. 
+1. Finally, we'll tell the ER-X DNS server to send requests for name resolution for names ending in `.local.mesh` to the AREDN router's LAN interface IP address (from your table) where your local AREDN node's DNS server is listening. Likewise, we'll tell the ER-X to send requests ending in `hamwan.net` to the HamWAN DNS servers.
 
 		set service dns forwarding options server=/local.mesh/<value from Line 1 in your table>
+		set service dns forwarding options server=/hamwan.net/44.24.244.2@eth4
+		set service dns forwarding options server=/hamwan.net/44.24.245.2@eth4
 		commit;save
 
+	Note that in the case of the `hamwan.net` DNS servers, the `@eth4` tells the DNS service to source DNS queries for `hamwan.net` so that they come from interface `eth4`, which is the interface connecting the ER-X to the HamWAN router.
+	
 1. If you opted to put a switch between the AREDN LAN port and ER-X `eth2`, install that switch now and connect an ethernet cable between the ER-X `eth2` port and your switch, and between the AREDN LAN port and your switch.  Otherwise, just connect an ethernet cable from ER-X port `eth2` to the AREDN router LAN port.  
 
 1. Open another browser window on your PC and see if you can go to __http://localnode.local.mesh__, which is the web interface of your AREDN router.  If so, it's working!  

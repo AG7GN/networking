@@ -106,7 +106,7 @@ AUTHOR:  Steve Magnuson, AG7GN
 
 	The advantage to Scenario B is that the hostname learned by the DHCP server via the DHCPv4 assignment to a client is that the DHCPv6 process uses that same name, so you can reach the host using the same name to either it's IPv4 or IPv6 address. It all happens automatically. However, the name does not work for MacOS 11 and Apple IOS devices for IPv6. It works fine for IPv4, though. Don't know why. Linux and Windows hosts work as expected.
 
-1. Configure the external facing interface to request a [prefix delegation](https://en.wikipedia.org/wiki/Prefix_delegation) from the ISP
+1. Configure the external facing interface (`eth3` in this example) to request a [prefix delegation](https://en.wikipedia.org/wiki/Prefix_delegation) from the ISP
 
 		set interfaces ethernet eth3 dhcpv6-pd prefix-only
 		set interfaces ethernet eth3 dhcpv6-pd rapid-commit enable
@@ -114,8 +114,11 @@ AUTHOR:  Steve Magnuson, AG7GN
 		set interfaces ethernet eth3 dhcpv6-pd pd 0 prefix-length 60
 
 	`dhcpv6-pd` is the prefix delegation configuration.
+	
 	`prefix-only` means don't assign global IPv6 address to the Internet facing `eth3`, we only want a prefix delegation that we can use on the internal networks.
+	
 	`no-dns` means the router itself won't use the ISP's IPv6 DNS servers. I prefer Cloud Flare's DNS servers and those will be configured later.
+	
 	`prefix-length 60` the size of the delegation (the number of network bits in the mask). Comcast allocates 60 bit prefixes.
 	
 1. Allocate subnets from the prefix delegation to inside network interfaces
@@ -142,7 +145,9 @@ AUTHOR:  Steve Magnuson, AG7GN
 		set interfaces ethernet eth3 dhcpv6-pd pd 0 interface eth2 prefix-id ':5'
 
 	`host-address ::1` means that that interface will be assigned IPv6 address `<prefix>::1`.
+	
 	`no-dns` means that the ISP's DNS servers will not be assigned via SLAAC to hosts on that inside interface.
+	
 	`prefix-id ::x` is the prefix assigned to that inside interface. So, say Comcast delegates this prefix to me:
 	
 		2601:face:cafe:4c80::/60
@@ -166,7 +171,7 @@ AUTHOR:  Steve Magnuson, AG7GN
 		2601:face:cafe:4c8e::/64
 		2601:face:cafe:4c8f::/64
 
-	So, `prefix-id ':1'` is the second subnet and I've assigned it to interface `eth1`. Interface `eth1` now has this IP address:
+	So, `prefix-id ':1'` is the second subnet and I've assigned it to interface `eth1`. Interface `eth1` now has this IPv6 address:
 	
 		2601:face:cafe:4c81::1/64
 	
@@ -272,6 +277,7 @@ AUTHOR:  Steve Magnuson, AG7GN
 	The `dhcp-range` is defined as follows:
 	
 	`::1000,::FFFF` the scope for this subnet. These are the start and end IP addresses within that subnet.
+	
 	`constructor:eth1,ra-names,slaac,64,24`
 	`eth1` The remainder of the line applies to the DHCPv6 server behavior on `eth1`.
 	

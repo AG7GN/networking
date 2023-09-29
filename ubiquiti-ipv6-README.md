@@ -223,10 +223,10 @@ AUTHOR:  Steve Magnuson, AG7GN
 
 	Set the domain globally and per-interface (they may be different - the per subnet domain designations here are redundant because the domain is the same in all cases):
 	
-		set service dns forwarding options domain=toadbox.org
-		set service dns forwarding options domain=toadbox.org,192.168.1.0/24,local
-		set service dns forwarding options domain=toadbox.org,192.168.2.0/24,local
-		set service dns forwarding options domain=toadbox.org,192.168.170.0/24,local
+		set service dns forwarding options domain=mydomain.org
+		set service dns forwarding options domain=mydomain.org,192.168.1.0/24,local
+		set service dns forwarding options domain=mydomain.org,192.168.2.0/24,local
+		set service dns forwarding options domain=mydomain.org,192.168.170.0/24,local
 
 	Send requests for names ending in `.local.mesh` to the AREDN router's name server:
 	
@@ -251,7 +251,7 @@ AUTHOR:  Steve Magnuson, AG7GN
 
 		set service dns forwarding options 'dhcp-option=option:router,0.0.0.0'
 		set service dns forwarding options 'dhcp-option=option:dns-server,0.0.0.0'
-		set service dns forwarding options 'dhcp-option=option:domain-search,toadbox.org'
+		set service dns forwarding options 'dhcp-option=option:domain-search,mydomain.org'
 		set service dns forwarding options 'dhcp-range=interface:eth1.2,192.168.2.100,192.168.2.200,24h'
 		set service dns forwarding options 'dhcp-range=interface:eth1.30,172.20.30.100,172.20.30.200,24h'
 		set service dns forwarding options 'dhcp-range=interface:eth1.43,192.168.43.100,192.168.43.200,24h'
@@ -261,7 +261,7 @@ AUTHOR:  Steve Magnuson, AG7GN
 
 	Set IPv6 DHCP options and scopes. The `dns-server` setting of `[::]` will cause the DHCP server to send the router's IP address (which is the address the router's DNS server is listening on) to the client.
 	
-		set service dns forwarding options 'dhcp-option=option6:domain-search,toadbox.org'
+		set service dns forwarding options 'dhcp-option=option6:domain-search,mydomain.org'
 		set service dns forwarding options 'dhcp-option=option6:dns-server,[::]'
 		set service dns forwarding options 'dhcp-range=::1000,::FFFF,constructor:eth1,ra-names,slaac,64,24h'
 		set service dns forwarding options 'dhcp-range=::1000,::FFFF,constructor:eth1.2,ra-names,slaac,64,24h'
